@@ -1,6 +1,6 @@
 # Skybrain-AI 🧠🤖
 AI which aims to solve the [SkyBlock](https://skyblock.net) Minecraft survival challange. The network is created by using the NEAT algorithm.
-
+![image](https://user-images.githubusercontent.com/7690439/200194574-91f809b6-131b-417a-9d28-652a5fb69669.png)
 ## Prerequisits
 - Java 1.8
 
@@ -31,4 +31,4 @@ with
 ```
 java -Xmx$maxMem -XstartOnFirstThread -jar $fatjar --envPort=$port
 ```
-![image](https://user-images.githubusercontent.com/7690439/200194574-91f809b6-131b-417a-9d28-652a5fb69669.png)
+
