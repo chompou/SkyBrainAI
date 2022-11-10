@@ -9,15 +9,19 @@ def translate_action(action):
     cam_yaw_down = action == 7
 
     return [
-        1 if forward else 2 if backward else 0,             # 0
-        1 if left else 2 if right else 0,                   # 1
-        0,                                                  # 2
-        11 if cam_yaw_up else 13 if cam_yaw_down else 12,   # 3
-        11 if cam_pitch_l else 13 if cam_pitch_r else 12,   # 4
-        0,                                                  # 5
-        0,                                                  # 6
-        0,                                                  # 7
+        1 if forward else 2 if backward else 0,  # 0
+        1 if left else 2 if right else 0,  # 1
+        0,  # 2
+        11 if cam_yaw_up else 13 if cam_yaw_down else 12,  # 3
+        11 if cam_pitch_l else 13 if cam_pitch_r else 12,  # 4
+        0,  # 5
+        0,  # 6
+        0,  # 7
     ]
+
+
+def rgb_simplify(array):
+    return array[:, :60, :60]
 
 
 class Mission:
@@ -43,7 +47,7 @@ class Mission:
             reward = 0
         self.episode += 1
         if self.obs_simplify:
-            obs = obs.get('rgb')[:, :60, :60]
+            obs = rgb_simplify(obs.get('rgb'))
         if self.episode >= self.episode_length:
             done = True
         if self.survival:
@@ -54,7 +58,7 @@ class Mission:
         if self.explore:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
             old = self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
-                    'distance_travelled_cm') is not None else 0
+                'distance_travelled_cm') is not None else 0
             reward += new - old
         self.delta = (obs, reward, done, info)
         return obs, reward, done, info
@@ -64,9 +68,12 @@ class Mission:
         self.__init__(explore=self.explore, obs_simplify=self.obs_simplify, mine=self.mine, survival=self.survival,
                       collect_amount=self.collect_amount,
                       per_item_reward=self.per_item_reward, episode_length=self.episode_length, env=self.env,
-                      prev_distance=self.delta[3].get('distance_travelled_cm') if self.delta[3].get('distance_travelled_cm') is not None else 0)
+                      prev_distance=self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
+                          'distance_travelled_cm') is not None else 0)
         for i in range(5):
-            self.env.step(translate_action(100))
+            _, __, ___, ____ = self.stepNum(100)
+
+        return _
 
     def step(self, action):
         _, __, ___, ____ = self.env.step(action)
@@ -78,3 +85,6 @@ class Mission:
     def stepNum(self, num):
         action = translate_action(num)
         return self.step(action)
+
+    def render(self):
+        self.env.render()

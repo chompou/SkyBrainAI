@@ -90,7 +90,7 @@ class ReplayMemory(object):
 class Steve:
 
     def __init__(self, learning_rate=0.001, gamma=0.99, tau=0.01, replay_buffer_size=10000):
-        self.action_space = 9
+        self.action_space = 8
 
         self.learning_rate = learning_rate
         self.gamma = gamma

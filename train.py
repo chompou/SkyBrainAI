@@ -2,19 +2,18 @@ from itertools import count
 import numpy as np
 import ddql
 import minedojo
-
-SCREEN_RESOLUTION = (64, 64)
+import SkyRunner
 
 def train(agent, env, max_episodes=1000000):
     for i_e in range(max_episodes):
         state = env.reset()
 
         for t in count():
-            action = agent.sel_action(state['rgb'].copy())
+            action = agent.sel_action(state.copy())
 
-            next_state, reward, done, info = env.step(agent.translate_action(action))
+            next_state, reward, done, info = env.stepNum(action)
 
-            agent.memory.push(state['rgb'].copy(), action, reward, next_state['rgb'].copy(), done)
+            agent.memory.push(state, action, reward, next_state.copy(), done)
 
             agent.replay_memory()
 
@@ -26,13 +25,8 @@ def train(agent, env, max_episodes=1000000):
                 break
 
 def begin():
-    mc_env = minedojo.make(
-        task_id="harvest_wool_with_shears_and_sheep",
-        image_size=SCREEN_RESOLUTION,
-        fast_reset=True,
-    )
+    mc_env = SkyRunner.create_env()
     steve = ddql.Steve()
 
     train(steve, mc_env)
 
-begin()
