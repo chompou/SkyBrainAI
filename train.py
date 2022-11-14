@@ -1,7 +1,5 @@
 from itertools import count
-import numpy as np
 import ddql
-import minedojo
 import SkyRunner
 
 def train(agent, env, max_episodes=1000000):
@@ -19,8 +17,6 @@ def train(agent, env, max_episodes=1000000):
 
             state = next_state
 
-            env.render()
-
             if done:
                 break
 
@@ -30,3 +26,4 @@ def begin():
 
     train(steve, mc_env)
 
+begin()
