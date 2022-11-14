@@ -1,0 +1,2 @@
+2022-11-10 17:15:59 dhcp-10-22-45-181.wlan.ntnu.no watchdog[65211] INFO Watchdog started between parent 65193 and child 65197
+2022-11-10 17:17:13 dhcp-10-22-45-181.wlan.ntnu.no watchdog[65211] INFO Parent is not running, hence we need terminate the child.

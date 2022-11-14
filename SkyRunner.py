@@ -3,6 +3,7 @@ import Skyruner_mission_interpreter
 
 image_size = (100, 60)
 
+
 def create_env():
     env = minedojo.make(
         "open-ended",
