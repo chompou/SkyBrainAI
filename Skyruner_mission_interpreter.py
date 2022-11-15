@@ -71,20 +71,20 @@ class Mission:
                       prev_distance=self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
                           'distance_travelled_cm') is not None else 0)
         for i in range(5):
-            _, __, ___, ____ = self.stepNum(100)
+            _, __, ___, ____ = self.step(100)
 
         return _
 
-    def step(self, action):
+    def stepOG(self, action):
         _, __, ___, ____ = self.env.step(action)
         return self.eval(_, __, ___, ____)
 
     def quit(self):
         self.env.__exit__()
 
-    def stepNum(self, num):
+    def step(self, num):
         action = translate_action(num)
-        return self.step(action)
+        return self.stepOG(action)
 
     def render(self):
         self.env.render()

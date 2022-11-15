@@ -14,6 +14,8 @@ class DDQN(torch.nn.Module):
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
 
+            torch.nn.MaxPool2d((10, 10)),
+
             torch.nn.Conv2d(in_channels=state_dim,
                             out_channels=32,
                             kernel_size=8,
@@ -38,6 +40,7 @@ class DDQN(torch.nn.Module):
             torch.nn.ReLU(),
 
             torch.nn.Flatten(),
+
             torch.nn.Linear(
                 in_features=576,
                 out_features=576

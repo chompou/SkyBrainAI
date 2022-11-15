@@ -1,7 +1,7 @@
 import minedojo
 import Skyruner_mission_interpreter
 
-image_size = (100, 60)
+image_size = (600, 600)
 
 def create_env():
     env = minedojo.make(
