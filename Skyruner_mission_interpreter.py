@@ -21,7 +21,7 @@ def translate_action(action):
 
 
 def rgb_simplify(array):
-    return array[:, :60, :60]
+    return array[:, :150, :150]
 
 
 class Mission:

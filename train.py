@@ -1,15 +1,15 @@
 import time
 from itertools import count
-
-import gym
+from datetime import datetime
 import numpy as np
 from matplotlib import pyplot as plt
 
 import ddql
-import minedojo
 import SkyRunner
 
-def train(agent, env, max_episodes=1000000, checkpoint_every=100, update_stats_every=10):
+def train(agent, env, max_episodes=1000000, checkpoint_every=100000, update_stats_every=1):
+    identifier = str(datetime.now())
+
     for i_e in range(max_episodes):
         state = env.reset()
         accumulated_reward = 0
@@ -33,23 +33,28 @@ def train(agent, env, max_episodes=1000000, checkpoint_every=100, update_stats_e
 
             if done:
 
-                if e_c % checkpoint_every == 0:
-                    agent.save_checkpoint(e_c)
+                if (i_e+1) % checkpoint_every == 0:
+                    agent.save_checkpoint("./" + identifier + "/" + str(i_e) + ".chckp")
 
-                if e_c % update_stats_every == 0:
-                    add_to_plot(e_c,
+                if (i_e+1) % update_stats_every == 0:
+                    add_to_plot(i_e,
                                 accumulated_reward,
-                                np.array(elapsed_sim_time).mean()
+                                np.array(elapsed_sim_time).mean(),
+                                "./" + identifier + "/" + str(i_e) + ".chckp"
                                 )
 
                 break
 
 plot_history = []
-def add_to_plot(e, r, sim_time):
+def add_to_plot(e, r, sim_time, identifier="generic_id"):
     plot_history.append((e, r, sim_time))
     render_plot_history()
+    #plt.savefig(identifier + "/train_history.png")
+
 
 def render_plot_history():
+    plt.clf()
+
     hist = np.array(plot_history)
 
     e = hist[:, 0]
