@@ -1,5 +1,5 @@
 import minedojo
-import Skyruner_mission_interpreter
+import Skyrunner_mission_interpreter
 
 image_size = (600, 650)
 
@@ -25,5 +25,5 @@ def create_env():
         """
     )
 
-    return Skyruner_mission_interpreter.Mission(survival=True, explore=True, episode_length=100, min_y=-3,
+    return Skyrunner_mission_interpreter.Mission(survival=True, explore=True, episode_length=100, min_y=-3,
                                                 env=env)
