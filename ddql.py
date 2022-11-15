@@ -2,6 +2,8 @@ import random
 from collections import deque, namedtuple
 import numpy as np
 import torch as torch
+import torchvision as torchvision
+from torchvision.transforms import InterpolationMode
 
 
 class DDQN(torch.nn.Module):
@@ -11,8 +13,12 @@ class DDQN(torch.nn.Module):
 
         self.learning_rate = lr
 
+        self.resize = torchvision.transforms.Resize((60, 60), interpolation=InterpolationMode.NEAREST, antialias=None, )
+
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
+
+            #torch.nn.MaxPool2d((10, 10)),
 
             torch.nn.Conv2d(in_channels=state_dim,
                             out_channels=32,
@@ -38,6 +44,7 @@ class DDQN(torch.nn.Module):
             torch.nn.ReLU(),
 
             torch.nn.Flatten(),
+
             torch.nn.Linear(
                 in_features=576,
                 out_features=576
@@ -48,6 +55,7 @@ class DDQN(torch.nn.Module):
         )
 
     def forward(self, obs):
+        obs = self.resize(obs)
         return self.model(obs)
 
 
@@ -96,7 +104,7 @@ class Steve:
         self.gamma = gamma
         self.tau = tau
 
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("mps" if torch.cuda.is_available() else "cpu")
 
         self.model = DDQN(3, self.action_space)
         self.target_model = DDQN(3, self.action_space)
@@ -167,3 +175,10 @@ class Steve:
             0,
             0,
         ]
+
+    def save_checkpoint(self, path):
+        torch.save({
+            'model_state_dict': self.model.state_dict(),
+            'target_model_state_dict': self.target_model.state_dict(),
+            'optimizer_state_': self.optimizer.state_dict()
+        }, path)
