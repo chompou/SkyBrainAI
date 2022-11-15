@@ -13,12 +13,8 @@ class DDQN(torch.nn.Module):
 
         self.learning_rate = lr
 
-        self.resize = torchvision.transforms.Resize((60, 60), interpolation=InterpolationMode.NEAREST, antialias=None, )
-
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
-
-            #torch.nn.MaxPool2d((10, 10)),
 
             torch.nn.Conv2d(in_channels=state_dim,
                             out_channels=32,
@@ -55,7 +51,6 @@ class DDQN(torch.nn.Module):
         )
 
     def forward(self, obs):
-        obs = self.resize(obs)
         return self.model(obs)
 
 

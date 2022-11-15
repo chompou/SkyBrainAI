@@ -1,6 +1,10 @@
 import numpy as np
+import torch
+import torchvision
 from PIL import Image
 from datetime import datetime
+
+from torchvision.transforms import InterpolationMode
 
 
 def translate_action(action):
@@ -25,10 +29,6 @@ def translate_action(action):
     ]
 
 
-def rgb_simplify(array):
-    return array[:, :600, :600]
-
-
 class Mission:
     def __init__(self, explore=False, obs_simplify=True, mine=False, survival=False, collect_amount=None,
                  per_item_reward=None, episode_length=1000, env=None, prev_distance=0, min_y=0):
@@ -36,6 +36,8 @@ class Mission:
             per_item_reward = []
         if collect_amount is None:
             collect_amount = []
+
+        self.resize = torchvision.transforms.Resize((60, 60), interpolation=InterpolationMode.NEAREST, antialias=None, )
         self.obs_simplify = obs_simplify
         self.explore = explore
         self.mine = mine
@@ -56,7 +58,7 @@ class Mission:
             if info.get('ypos') < self.min_y:
                 done = True
         if self.obs_simplify:
-            obs = rgb_simplify(obs.get('rgb'))
+            obs = self.rgb_simplify(obs.get('rgb'))
         if self.episode >= self.episode_length:
             done = True
         if self.survival:
@@ -98,9 +100,9 @@ class Mission:
     def render(self):
         self.env.render()
 
-    def saveRGB(self, array):
+    def save_rgb(self, array):
         now = datetime.now()
-        src = 'renders/'+str(now)+'render.png'
+        src = 'renders/' + str(now) + 'render.png'
         n1 = array[0, :, :]
         n2 = array[1, :, :]
         n3 = array[2, :, :]
@@ -108,3 +110,6 @@ class Mission:
         result = np.dstack((n1, n2, n3))
         result = Image.fromarray(result.astype(np.uint8))
         result.save(src)
+
+    def rgb_simplify(self, array):
+        return self.resize(torch.Tensor(array[:, :600, :600].copy())).numpy().astype(dtype='uint8')
