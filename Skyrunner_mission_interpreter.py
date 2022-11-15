@@ -100,11 +100,11 @@ class Mission:
 
     def saveRGB(self, array):
         now = datetime.now()
-        src = './renders/'+str(now)+'render.png'
+        src = 'renders/'+str(now)+'render.png'
         n1 = array[0, :, :]
         n2 = array[1, :, :]
         n3 = array[2, :, :]
 
         result = np.dstack((n1, n2, n3))
         result = Image.fromarray(result.astype(np.uint8))
-        result.save('result.png')
+        result.save(src)

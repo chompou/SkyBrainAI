@@ -1,7 +1,7 @@
 import minedojo
 import Skyrunner_mission_interpreter
 
-image_size = (600, 650)
+image_size = (660, 600)
 
 
 def create_env():
