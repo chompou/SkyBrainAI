@@ -1,3 +1,8 @@
+import numpy as np
+from PIL import Image
+from datetime import datetime
+
+
 def translate_action(action):
     forward = action == 0
     backward = action == 1
@@ -21,12 +26,12 @@ def translate_action(action):
 
 
 def rgb_simplify(array):
-    return array[:, :60, :60]
+    return array[:, :600, :600]
 
 
 class Mission:
     def __init__(self, explore=False, obs_simplify=True, mine=False, survival=False, collect_amount=None,
-                 per_item_reward=None, episode_length=1000, env=None, prev_distance=0):
+                 per_item_reward=None, episode_length=1000, env=None, prev_distance=0, min_y=0):
         if per_item_reward is None:
             per_item_reward = []
         if collect_amount is None:
@@ -41,11 +46,15 @@ class Mission:
         self.episode = 0
         self.episode_length = episode_length
         self.env = env
+        self.min_y = min_y
 
     def eval(self, obs, reward, done, info):
         if reward is None:
             reward = 0
         self.episode += 1
+        if self.min_y:
+            if info.get('ypos') < self.min_y:
+                done = True
         if self.obs_simplify:
             obs = rgb_simplify(obs.get('rgb'))
         if self.episode >= self.episode_length:
@@ -69,8 +78,8 @@ class Mission:
                       collect_amount=self.collect_amount,
                       per_item_reward=self.per_item_reward, episode_length=self.episode_length, env=self.env,
                       prev_distance=self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
-                          'distance_travelled_cm') is not None else 0)
-        for i in range(5):
+                          'distance_travelled_cm') is not None else 0, min_y=self.min_y)
+        for i in range(2):
             _, __, ___, ____ = self.stepNum(100)
 
         return _
@@ -88,3 +97,14 @@ class Mission:
 
     def render(self):
         self.env.render()
+
+    def saveRGB(self, array):
+        now = datetime.now()
+        src = './renders/'+str(now)+'render.png'
+        n1 = array[0, :, :]
+        n2 = array[1, :, :]
+        n3 = array[2, :, :]
+
+        result = np.dstack((n1, n2, n3))
+        result = Image.fromarray(result.astype(np.uint8))
+        result.save('result.png')
