@@ -3,12 +3,13 @@ from itertools import count
 from datetime import datetime
 import numpy as np
 from matplotlib import pyplot as plt
+from IPython.display import clear_output
 
 import ddql
 import SkyRunner
 
 
-def train(agent, env, max_episodes=1000000, checkpoint_every=100000, update_stats_every=1):
+def train(agent, env, max_episodes=1000000, checkpoint_every=100000, update_stats_every=1, render=False):
     identifier = str(datetime.now())
 
     for i_e in range(max_episodes):
@@ -30,7 +31,8 @@ def train(agent, env, max_episodes=1000000, checkpoint_every=100000, update_stat
 
             state = next_state
 
-            env.render()
+            if render:
+                env.render()
 
             if done:
 
@@ -57,6 +59,7 @@ def add_to_plot(e, r, sim_time, identifier="generic_id"):
 
 
 def render_plot_history():
+    clear_output()
     plt.clf()
 
     hist = np.array(plot_history)
