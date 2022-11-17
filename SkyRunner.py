@@ -22,7 +22,9 @@ def create_env():
         <DrawCuboid x1="1" y1="-1" z1="-3" x2="3" y2="-1" z2="-5" type="dirt"/>
         <DrawCuboid x1="1" y1="1" z1="-3" x2="3" y2="1" z2="-5" type="grass"/>
         <DrawCuboid x1="3" y1="2" z1="-5" x2="3" y2="6" z2="-5" type="log"/>
-        """
+        """,
+        use_lidar=True,
+        lidar_rays=[(0, 0, 999)]
     )
 
     return Skyrunner_mission_interpreter.Mission(survival=True, explore=True, episode_length=100, min_y=-3,
