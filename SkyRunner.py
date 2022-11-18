@@ -60,7 +60,10 @@ class CustomEnv(gym.Env):
         return -1
 
     def render(self, mode="human"):
-        self.env.render()
+        return self.env.render(mode=mode)
+
+    def get_rgb(self):
+        return self.env.save_rgb()
 
     def close(self):
         self.env.quit()
