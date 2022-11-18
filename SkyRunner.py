@@ -1,5 +1,9 @@
 import minedojo
+import numpy as np
+
 import Skyrunner_mission_interpreter
+import gym
+from gym import spaces
 
 image_size = (660, 600)
 
@@ -28,4 +32,36 @@ def create_env():
     )
 
     return Skyrunner_mission_interpreter.Mission(survival=True, explore=True, episode_length=100, min_y=-3,
-                                                env=env)
+                                                 env=env)
+
+
+class CustomEnv(gym.Env):
+    metadata = {"render.modes": ["human"]}
+
+    def __init__(self, ):
+        super(CustomEnv, self).__init__()
+        self.env = None
+        self.action_space = spaces.Discrete(8)
+        self.observation_space = spaces.Box(low=0, high=255,
+                                            shape=(3, 60, 60), dtype=np.uint8)
+
+    def step(self, action):
+        observation, reward, done, info = self.env.stepNum(action)
+        return observation, reward, done, info
+
+    def reset(self):
+        if self.env is None:
+            self.env = create_env()
+        for i in range(10):
+            try:
+                return self.env.reset()
+            except:
+                self.env = None
+        return -1
+
+    def render(self, mode="human"):
+        self.env.render()
+
+    def close(self):
+        self.env.quit()
+        self.__exit__()
