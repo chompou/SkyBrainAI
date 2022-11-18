@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 from itertools import count
 from datetime import datetime
 import numpy as np
@@ -9,7 +10,7 @@ import ddql
 import SkyRunner
 
 
-def train(agent, env, max_episodes=1000000, checkpoint_every=100000, update_stats_every=1, render=False):
+def train(agent, env, max_episodes=1000000, checkpoint_every=10, update_stats_every=1, render=False):
     identifier = str(datetime.now())
 
     for i_e in range(max_episodes):
@@ -37,7 +38,7 @@ def train(agent, env, max_episodes=1000000, checkpoint_every=100000, update_stat
             if done:
 
                 if (i_e + 1) % checkpoint_every == 0:
-                    agent.save_checkpoint("./" + identifier + "/" + str(i_e) + ".chckp")
+                    agent.save_checkpoint(identifier + '-' + str(last_num_avg(10)))
 
                 if (i_e + 1) % update_stats_every == 0:
                     add_to_plot(i_e,
@@ -50,6 +51,13 @@ def train(agent, env, max_episodes=1000000, checkpoint_every=100000, update_stat
 
 
 plot_history = []
+
+
+def last_num_avg(num=10):
+    val = 0
+    for i in plot_history[len(plot_history) - 10:]:
+        val += i[1]
+    return val / num
 
 
 def add_to_plot(e, r, sim_time, identifier="generic_id"):
