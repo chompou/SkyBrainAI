@@ -4,6 +4,7 @@ from datetime import datetime
 import numpy as np
 from matplotlib import pyplot as plt
 from IPython.display import clear_output
+import threading
 
 import ddql
 import SkyRunner
@@ -83,8 +84,13 @@ def render_plot_history():
     plt.show()
 
 
+t1 = threading.Thread(SkyRunner.create_env(), name='t1')
+
+
 def begin():
-    mc_env = SkyRunner.create_env()
+    t1.start()
+    t1.join()
+    mc_env = t1
     steve = ddql.Steve()
 
     train(steve, mc_env)
