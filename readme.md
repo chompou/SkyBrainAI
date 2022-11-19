@@ -15,20 +15,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 ```
 
 Verify that the java-version is correct by running `java -version`. The output should be `1.8.x.x`
-### 2. Installing MineRL
-Start by running the following command.
-```bash
-pip install --verbose git+https://github.com/minerllabs/minerl
+### 2. Installing Dependencies:
+```text
+pip install minedojo, stable-baselines3, torchvision
 ```
-
-### 3. Configure MineRL settings
-Navigate and open the file `./venv/lib/minerl/MCP../initiateRun`
-Then change the line containing
-```
-java -Xmx$maxMem -jar $fatjar --envPort=$port
-```
-with
-```
-java -Xmx$maxMem -XstartOnFirstThread -jar $fatjar --envPort=$port
-```
-
