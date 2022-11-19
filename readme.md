@@ -17,5 +17,5 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 Verify that the java-version is correct by running `java -version`. The output should be `1.8.x.x`
 ### 2. Installing Dependencies:
 ```text
-pip install minedojo, stable-baselines3, torchvision
+pip install minedojo, stable-baselines3, torchvision, tensorboard
 ```
