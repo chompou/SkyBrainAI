@@ -15,7 +15,7 @@ def create_env():
         generate_world_type='flat',
         flat_world_seed_string="0",
         start_position=dict(x=0, y=2, z=0, yaw=0, pitch=0),
-        fast_reset=True,
+        #fast_reset=True,
         start_time=6000,
         allow_time_passage=False,
         drawing_str="""

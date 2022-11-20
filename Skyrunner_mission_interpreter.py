@@ -8,7 +8,6 @@ from datetime import datetime
 from torchvision.transforms import InterpolationMode
 
 
-
 def spawn():
     x_z = [
         (0, 0), (-1, 0), (-2, 0), (-3, 0),
@@ -43,7 +42,7 @@ class Mission:
         self.survival = survival
         self.per_item_reward = per_item_reward
         self.collect_amount = collect_amount
-        self.delta = ({}, {}, {}, {'distance_travelled_cm': prev_distance})
+        self.delta = ({}, {}, {}, {'distance_travelled_cm': prev_distance, 'rays': ['init', 1000]})
         self.episode = 0
         self.episode_length = episode_length
         self.env = env
@@ -66,7 +65,8 @@ class Mission:
             0,  # 2
             11 if cam_yaw_up else 13 if cam_yaw_down else 12,  # 3
             11 if cam_pitch_l else 13 if cam_pitch_r else 12,  # 4
-            0,  # 5
+            3 if self.attack and self.delta[3].get('rays')[0] == 'wood' and self.delta[3].get('rays')[1] < 3 else 0,
+            # 5
             0,  # 6
             0,  # 7
         ]
