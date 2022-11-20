@@ -7,6 +7,9 @@ import SkyRunner
 
 from stable_baselines3.dqn import DQN, MlpPolicy
 
+from CustomBaselines3.DoubleDQN import DoubleDQN
+
+
 class ImageRecorderCallback(BaseCallback):
     def __init__(self, env, verbose=0):
         super(ImageRecorderCallback, self).__init__(verbose)
@@ -22,38 +25,36 @@ class ImageRecorderCallback(BaseCallback):
         return True
 
 
-def train(env):
+def train(env, eval_env=None, eval_freq=2000):
     """
     Train and save the DQN model, for the cartpole problem
     :param args: (ArgumentParser) the input arguments
     """
 
-    model = DQN(
+    model = DoubleDQN(
         env=env,
         policy=MlpPolicy,
-        learning_rate=1e-2,
+        learning_rate=1e-4,
         learning_starts=750,
-        buffer_size=50000,
-        exploration_fraction=0.55,
+        buffer_size=30000,
+        exploration_fraction=0.45,
         exploration_final_eps=0.075,
-        gamma=0.975,
-        tau=0.85,
-        tensorboard_log="./DQN_steve_tensorboard/"
+        gamma=0.98,
+        target_update_interval=3,
+        gradient_steps=-1,
+        batch_size=150,
+        tau=0.98,
+        tensorboard_log="./DQN_steve_tensorboard/",
+        use_prioritized_replay=True,
+        prioritized_replay_eps=1e-5
     )
-    model.learn(total_timesteps=10000, callback=ImageRecorderCallback(env=env))
 
-    obs = env.reset()
-    r = 0
-    for i in range(5000):
-        action, _state = model.predict(obs, deterministic=False)
-        obs, reward, done, info = env.step(action)
-        r += reward
-        env.render()
+    model.save("last_model")
 
-        if done:
-            print(r)
-            r = 0
-            obs = env.reset()
+    model.learn(total_timesteps=150000,
+                eval_env=eval_env,
+                eval_freq=eval_freq,
+                n_eval_episodes=5,
+                #callback=ImageRecorderCallback(env=env)
+                )
 
-    print("Saving model to cartpole_model.zip")
-    model.save("cartpole_model.zip")
