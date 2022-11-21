@@ -1,4 +1,6 @@
 import random
+
+import gym
 import numpy as np
 import torch
 import torchvision
@@ -8,27 +10,19 @@ from stable_baselines3.common.logger import Image
 from torchvision.transforms import InterpolationMode
 
 
-def spawn():
-    x_z = [
-        (0, 0), (-1, 0), (-2, 0), (-3, 0),
-        (0, -1), (-1, -1), (-2, -1), (-3, -1),
-        (0, -2), (-1, -2), (-2, -2), (-3, -2),
-        (0, -3), (-1, -3), (-2, -3), (-3, -3),
-        (0, -4), (-1, -4), (-2, -4), (-3, -4),
-        (0, -5), (-1, -5), (-2, -5), (-3, -5),
-        (1, -3), (1, -4), (1, -5),
-        (1, -3), (2, -3), (3, -3),
-    ]
-    rad = [-90, 0, 90, 180]
-
-    pos = random.choice(x_z)
-    yaw = random.choice(rad)
-    return pos[0], 2, pos[1], yaw, 0
-
-
 class Mission:
-    def __init__(self, explore=False, obs_simplify=True, mine=False, survival=False, collect_amount=None,
-                 per_item_reward=None, episode_length=1000, env=None, prev_distance=0, min_y=0):
+    def __init__(self, explore=False,
+                 obs_simplify=True,
+                 mine=False,
+                 survival=False,
+                 collect_amount=None,
+                 spawn_locations=None,
+                 per_item_reward=None,
+                 episode_length=1000,
+                 env=None,
+                 min_y=0
+                 ):
+
         self.attack = None
         if per_item_reward is None:
             per_item_reward = []
@@ -42,11 +36,24 @@ class Mission:
         self.survival = survival
         self.per_item_reward = per_item_reward
         self.collect_amount = collect_amount
-        self.delta = ({}, {}, {}, {'distance_travelled_cm': prev_distance, 'rays': ['init', 1000]})
+        self.delta = None # Initiated in init_env
         self.episode = 0
         self.episode_length = episode_length
         self.env = env
         self.min_y = min_y
+        self.spawn_locations = spawn_locations
+        self.location_index = 0
+        self.max_location_index = 0
+
+        if spawn_locations is not None:
+            self.max_location_index = len(spawn_locations)
+
+        self.init_env()
+
+    def init_env(self):
+        self.delta = ({}, {}, {}, {'distance_travelled_cm': 0, 'rays': ['init', 1000]})
+        self.episode = 0
+
 
     def translate_action(self, action):
         forward = action == 0
@@ -90,8 +97,7 @@ class Mission:
                 done = True
         if self.attack:
             if info.get('rays')[0] == 'wood' and info.get('rays')[1] < 2:
-                reward += 1000
-                done = True
+                reward += 100
         if self.explore:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
             old = self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
@@ -104,13 +110,9 @@ class Mission:
 
     def reset(self):
         self.env.reset()
-        self.__init__(explore=self.explore, obs_simplify=self.obs_simplify, mine=self.mine, survival=self.survival,
-                      collect_amount=self.collect_amount,
-                      per_item_reward=self.per_item_reward, episode_length=self.episode_length, env=self.env,
-                      prev_distance=self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
-                          'distance_travelled_cm') is not None else 0, min_y=self.min_y)
+        self.init_env()
 
-        x, y, z, yaw, pitch = spawn()
+        x, y, z, yaw, pitch = self.spawn()
 
         self.env.teleport_agent(x=x, y=y, z=z, yaw=yaw, pitch=pitch)
 
@@ -150,3 +152,24 @@ class Mission:
 
     def rgb_simplify(self, array):
         return self.resize(torch.Tensor(array[:, :600, :600].copy())).numpy().astype(dtype='uint8')
+
+    def spawn(self):
+        if self.spawn_locations is None:
+            x_z = [
+                (0, 0), (-1, 0), (-2, 0), (-3, 0),
+                (0, -1), (-1, -1), (-2, -1), (-3, -1),
+                (0, -2), (-1, -2), (-2, -2), (-3, -2),
+                (0, -3), (-1, -3), (-2, -3), (-3, -3),
+                (0, -4), (-1, -4), (-2, -4), (-3, -4),
+                (0, -5), (-1, -5), (-2, -5), (-3, -5),
+                (1, -3), (1, -4), (1, -5),
+                (1, -3), (2, -3), (3, -3),
+            ]
+        else:
+            x_z = self.spawn_locations[random.randint(0, self.max_location_index-1)]
+
+        rad = [-90, 0, 90, 180]
+
+        pos = random.choice(x_z)
+        yaw = random.choice(rad)
+        return pos[0], 2, pos[1], yaw, 0

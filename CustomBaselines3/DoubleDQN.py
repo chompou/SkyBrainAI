@@ -102,6 +102,9 @@ class DoubleDQN(OffPolicyAlgorithm):
         _init_setup_model: bool = True,
         use_prioritized_replay: bool = True,
         prioritized_replay_eps: float = 1e-6,
+        prioritized_replay_initial_beta: float = 1.0,
+        prioritized_replay_beta_fraction: float = 0.4,
+        prioritized_replay_final_beta: float = 0.2
     ):
 
         super().__init__(
@@ -142,8 +145,13 @@ class DoubleDQN(OffPolicyAlgorithm):
         self.exploration_rate = 0.0
         # Linear schedule will be defined in `_setup_model()`
         self.exploration_schedule = None
+        self.prioritized_replay_beta_schedule = None
         self.q_net, self.q_net_target = None, None
         self.prioritized_replay_eps = prioritized_replay_eps
+        self.prioritized_replay_initial_beta = prioritized_replay_initial_beta
+        self.prioritized_replay_beta_fraction = prioritized_replay_beta_fraction
+        self.prioritized_replay_final_beta = prioritized_replay_final_beta
+        self.beta = self.prioritized_replay_initial_beta
 
         if use_prioritized_replay:
             self.replay_buffer_class = PrioritizedReplayBuffer
@@ -162,6 +170,13 @@ class DoubleDQN(OffPolicyAlgorithm):
             self.exploration_final_eps,
             self.exploration_fraction,
         )
+
+        self.prioritized_replay_beta_schedule = get_linear_fn(
+            self.prioritized_replay_initial_beta,
+            self.prioritized_replay_final_beta,
+            self.prioritized_replay_final_beta
+        )
+
         # Account for multiple environments
         # each call to step() corresponds to n_envs transitions
         if self.n_envs > 1:
@@ -203,7 +218,8 @@ class DoubleDQN(OffPolicyAlgorithm):
         for _ in range(gradient_steps):
             # Sample replay buffer
             if self.use_prioritized_replay:
-                replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env, beta=0.3)
+                self.beta = self.prioritized_replay_beta_schedule(self._current_progress_remaining)
+                replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env, beta=beta)
             else:
                 replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env)
 

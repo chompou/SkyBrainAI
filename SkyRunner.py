@@ -1,5 +1,6 @@
 import minedojo
 import numpy as np
+from environment_drawer import draw_skyblock_grid
 
 import Skyrunner_mission_interpreter
 import gym
@@ -9,31 +10,29 @@ image_size = (660, 600)
 
 
 def create_env():
+    draw_string, spawn_locations = draw_skyblock_grid(100, 100, 15)
+
     env = minedojo.make(
         "open-ended",
         image_size=image_size,
         generate_world_type='flat',
         flat_world_seed_string="0",
         start_position=dict(x=0, y=2, z=0, yaw=0, pitch=0),
-        #fast_reset=True,
+        fast_reset=True,
         start_time=6000,
         allow_time_passage=False,
-        drawing_str="""
-        <DrawCuboid x1="0" y1="0" z1="0" x2="-3" y2="0" z2="-5" type="dirt"/>
-        <DrawCuboid x1="0" y1="-1" z1="0" x2="-3" y2="-1" z2="-5" type="dirt"/>
-        <DrawCuboid x1="0" y1="1" z1="0" x2="-3" y2="1" z2="-5" type="grass"/>
-        <DrawCuboid x1="1" y1="0" z1="-3" x2="3" y2="0" z2="-5" type="dirt"/>
-        <DrawCuboid x1="1" y1="-1" z1="-3" x2="3" y2="-1" z2="-5" type="dirt"/>
-        <DrawCuboid x1="1" y1="1" z1="-3" x2="3" y2="1" z2="-5" type="grass"/>
-        <DrawCuboid x1="3" y1="2" z1="-5" x2="3" y2="6" z2="-5" type="log"/>
-        """,
+        drawing_str=draw_string,
         use_lidar=True,
         lidar_rays=[(0, 0, 999)]
     )
 
-    return Skyrunner_mission_interpreter.Mission(survival=True, explore=True, episode_length=100, min_y=-3,
-                                                 env=env)
-
+    return Skyrunner_mission_interpreter.Mission(survival=True,
+                                                 explore=True,
+                                                 episode_length=100,
+                                                 min_y=-3,
+                                                 env=env,
+                                                 spawn_locations=spawn_locations
+                                                 )
 
 class CustomEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
@@ -51,7 +50,7 @@ class CustomEnv(gym.Env):
 
     def reset(self):
         if self.env is None:
-            self.env = create_env()
+            self.env = create_env(), 4
         for i in range(10):
             try:
                 return self.env.reset()
