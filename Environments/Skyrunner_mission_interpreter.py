@@ -34,7 +34,7 @@ class Mission:
         self.survival = survival
         self.per_item_reward = per_item_reward
         self.collect_amount = collect_amount
-        self.delta = None # Initiated in init_env
+        self.delta = None  # Initiated in init_env
         self.episode = 0
         self.episode_length = episode_length
         self.env = env
@@ -51,7 +51,6 @@ class Mission:
     def init_env(self):
         self.delta = ({}, {}, {}, {'distance_travelled_cm': 0, 'rays': ['init', 1000]})
         self.episode = 0
-
 
     def translate_action(self, action):
         forward = action == 0
@@ -170,7 +169,7 @@ class Mission:
                 (1, -3), (2, -3), (3, -3),
             ]
         else:
-            x_z = self.spawn_locations[random.randint(0, self.max_location_index-1)]
+            x_z = self.spawn_locations[random.randint(0, self.max_location_index - 1)]
 
         rad = [-90, 0, 90, 180]
 
