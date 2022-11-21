@@ -69,6 +69,9 @@ class Worker(Thread):
                 print("got", local_env)
                 self.q_lock.release()
                 obs = local_env.reset()
+                if obs == -1:
+                    local_env = SkyRunner.CustomEnv()
+                    obs = local_env.reset()
                 self.r_lock.acquire()
                 self.r.put((obs, local_env))
                 self.r_lock.release()
