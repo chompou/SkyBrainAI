@@ -24,12 +24,8 @@ class MultithreadGym(gym.Env):
         original_frames = []
         frame, observation, reward, done, info = self.env.step(action)
         if original:
-            original_frames.append(frame)
-            
-        if self._preprocess is not None:
-            frame_ = self._preprocess(self._world, self._stage, frame)
-        else:
-            frame_ = frame
+            original_frames.append(frame)   
+        frame_ = frame
         self.frames.appendleft(frame_)
         if not original:
             return torch.stack(tuple(self.frames)), observation, reward, done, info
@@ -48,8 +44,8 @@ class MultithreadGym(gym.Env):
             else:
                 ready = True
         self.env = local_env
-        frame = self._env.reset()
-        frame_ = self._preprocess(self._world, self._stage, frame)
+        frame = self.env.reset()
+        frame_ = local_obs
         self.frames = deque([frame_]*self.n_frames, self.n_frames)
         if not original:
             return torch.stack(tuple(self.frames))
