@@ -1,7 +1,6 @@
 import minedojo
 import numpy as np
-
-import Skyrunner_mission_interpreter
+from Environments import Skyrunner_mission_interpreter
 import gym
 from gym import spaces
 

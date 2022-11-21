@@ -1,11 +1,6 @@
-import argparse
-
 from stable_baselines3.common.callbacks import BaseCallback
-from stable_baselines3.common.logger import Image
 
-import SkyRunner
-
-from stable_baselines3.dqn import DQN, MlpPolicy
+from stable_baselines3.dqn import MlpPolicy
 
 from CustomBaselines3.DoubleDQN import DoubleDQN
 
