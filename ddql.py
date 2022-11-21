@@ -13,12 +13,8 @@ class DDQN(torch.nn.Module):
 
         self.learning_rate = lr
 
-        self.resize = torchvision.transforms.Resize((60, 60), interpolation=InterpolationMode.NEAREST, antialias=None, )
-
         self.criterion = torch.nn.MSELoss()
         self.model = torch.nn.Sequential(
-
-            #torch.nn.MaxPool2d((10, 10)),
 
             torch.nn.Conv2d(in_channels=state_dim,
                             out_channels=32,
@@ -55,7 +51,6 @@ class DDQN(torch.nn.Module):
         )
 
     def forward(self, obs):
-        obs = self.resize(obs)
         return self.model(obs)
 
 
@@ -98,7 +93,7 @@ class ReplayMemory(object):
 class Steve:
 
     def __init__(self, learning_rate=0.001, gamma=0.99, tau=0.01, replay_buffer_size=10000):
-        self.action_space = 8
+        self.action_space = 7
 
         self.learning_rate = learning_rate
         self.gamma = gamma
@@ -155,30 +150,14 @@ class Steve:
         for target_param, param in zip(self.target_model.parameters(), self.model.parameters()):
             target_param.data.copy_(self.tau * param + (1 - self.tau) * target_param)
 
-    def translate_action(self, action):
-        forward = action == 0
-        backward = action == 1
-        left = action == 2
-        right = action == 3
-        cam_pitch_l = action == 4
-        cam_pitch_r = action == 5
-        cam_yaw_up = action == 6
-        cam_yaw_down = action == 6
-
-        return [
-            1 if forward else 2 if backward else 0,
-            1 if left else 2 if right else 0,
-            0,
-            11 if cam_pitch_l else 13 if cam_pitch_r else 12,
-            11 if cam_yaw_up else 13 if cam_yaw_down else 12,
-            0,
-            0,
-            0,
-        ]
-
-    def save_checkpoint(self, path):
+    def save_checkpoint(self, name):
+        path = 'dDQN-checkpoints/' + name + '.chckp'
         torch.save({
             'model_state_dict': self.model.state_dict(),
             'target_model_state_dict': self.target_model.state_dict(),
             'optimizer_state_': self.optimizer.state_dict()
         }, path)
+
+    def load_chackpoint(self, latest=True):
+
+        torch.load(p)
