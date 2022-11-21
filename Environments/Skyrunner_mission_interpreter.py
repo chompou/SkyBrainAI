@@ -89,11 +89,14 @@ class Mission:
             if info.get('living_death_event_fired'):
                 done = True
         if self.attack:
-            if info.get('rays')[0] == 'wood' and info.get('rays')[1] < 3:
-                reward += 1000
-                done = True
-            if self.delta.get('rays')[0] == 'wood' and self.delta.get('rays')[1] < 3:
-                print("help")
+            curr_b = info.get('rays')[0]
+            curr_d = info.get('rays')[1]
+            prev_b = self.delta.get('rays')[0]
+            prev_d = self.delta.get('rays')[1]
+            if curr_b == 'wood' and curr_d < 3:
+                reward += 10
+            if prev_b == 'wood' and prev_d < 3 and (prev_d != curr_d or prev_b != curr_b):
+                reward += 100
         if self.explore:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
             old = self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
