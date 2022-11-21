@@ -2,8 +2,8 @@ import random
 import numpy as np
 import torch
 import torchvision
-from PIL import Image
 from datetime import datetime
+from stable_baselines3.common.logger import Image
 
 from torchvision.transforms import InterpolationMode
 
@@ -78,7 +78,7 @@ class Mission:
         if self.min_y:
             if info.get('ypos') < self.min_y:
                 done = True
-                reward -= 500
+                reward -= 15
         if self.obs_simplify:
             obs = self.rgb_simplify(obs.get('rgb'))
         if self.episode >= self.episode_length:
@@ -96,7 +96,8 @@ class Mission:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
             old = self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
                 'distance_travelled_cm') is not None else 0
-            reward += new - old
+            if new - old:
+                reward += 1
         self.attack = None
         self.delta = (obs, reward, done, info)
         return obs, reward, done, info
@@ -129,19 +130,17 @@ class Mission:
         action = self.translate_action(num)
         return self.step(action)
 
-    def render(self):
-        self.env.render()
+    def render(self, mode):
+        self.env.render(mode)
 
-    def save_rgb(self, array):
-        now = datetime.now()
-        src = 'renders/' + str(now) + 'render.png'
+    def save_rgb(self):
+        array = self.delta[0]
         n1 = array[0, :, :]
         n2 = array[1, :, :]
         n3 = array[2, :, :]
 
         result = np.dstack((n1, n2, n3))
-        result = Image.fromarray(result.astype(np.uint8))
-        result.save(src)
+        return Image(result, "HWC")
 
     def test_teleport(self):
         x, y, z, yaw, pitch = spawn()
