@@ -39,10 +39,10 @@ class Factory:
         exit_flag = 1
         for t in self.threads:
             t.join()
-        for e in self.q:
-            e.close()
-        for et in self.r:
-            et[1].close()
+        for e in range(self.q.qsize()):
+            self.q.get().close()
+        for et in range(self.r.qsize()):
+            self.r.get()[1].close()
 
 
 class Worker(Thread):
