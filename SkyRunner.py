@@ -10,7 +10,7 @@ image_size = (660, 600)
 
 
 def create_env():
-    draw_string, spawn_locations = draw_skyblock_grid(100, 100, 15)
+    draw_string, spawn_locations = draw_skyblock_grid(120, 120, 80)
 
     env = minedojo.make(
         "open-ended",
