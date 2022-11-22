@@ -1,3 +1,5 @@
+import traceback
+
 import minedojo
 import numpy as np
 from Environments import Skyrunner_mission_interpreter
@@ -56,6 +58,12 @@ class CustomEnv(gym.Env):
             try:
                 return self.env.reset()
             except:
+                print("Unable to reset enviornment due to an exception")
+                print(traceback.format_exc())
+                try:
+                    self.env.quit()
+                except:
+                    print("Failed to terminate broken enviornment.")
                 self.env = None
         return -1
 
