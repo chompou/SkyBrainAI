@@ -64,5 +64,9 @@ class CustomEnv(gym.Env):
         return self.env.save_rgb()
 
     def close(self):
-        self.env.quit()
+        if self.env is not None:
+            self.env.quit()
         self.__exit__()
+
+    def can_quick_reset(self):
+        return self.env.can_quick_reset()

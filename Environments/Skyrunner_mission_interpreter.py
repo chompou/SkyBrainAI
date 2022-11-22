@@ -40,8 +40,10 @@ class Mission:
         self.env = env
         self.min_y = min_y
         self.spawn_locations = spawn_locations
-        self.location_index = 0
+        self.location_index = -1
         self.max_location_index = 0
+        self.chopped_dist = 5
+        self.chopped = 0
 
         if spawn_locations is not None:
             self.max_location_index = len(spawn_locations)
@@ -51,6 +53,7 @@ class Mission:
     def init_env(self):
         self.delta = ({}, {}, {}, {'distance_travelled_cm': 0, 'rays': ['init', 1000]})
         self.episode = 0
+        self.chopped = 0
 
     def translate_action(self, action):
         forward = action == 0
@@ -69,7 +72,7 @@ class Mission:
             0,  # 2
             11 if cam_yaw_up else 13 if cam_yaw_down else 12,  # 3
             11 if cam_pitch_l else 13 if cam_pitch_r else 12,  # 4
-            3 if self.attack and self.delta[3].get('rays')[0] == 'wood' and self.delta[3].get('rays')[1] < 3 else 0,
+            3 if self.attack and self.delta[3].get('rays')[0] == 'wood' and self.delta[3].get('rays')[1] < self.chopped_dist else 0,
             # 5
             0,  # 6
             0,  # 7
@@ -97,22 +100,33 @@ class Mission:
             curr_d = info.get('rays')[1]
             prev_b = self.delta.get('rays')[0]
             prev_d = self.delta.get('rays')[1]
-            if curr_b == 'wood' and curr_d < 3:
+            if curr_b == 'wood' and curr_d < self.chopped_dist:
                 reward += 10
-            if prev_b == 'wood' and prev_d < 3 and (prev_d != curr_d or prev_b != curr_b):
+            if prev_b == 'wood' and prev_d < self.chopped_dist and (prev_d != curr_d or prev_b != curr_b):
                 reward += 100
+                self.chopped += 1
         if self.explore:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
             old = self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
                 'distance_travelled_cm') is not None else 0
             if new - old:
                 reward += 1
+        if self.chopped == 5:
+            done = True
         self.attack = None
         self.delta = (obs, reward, done, info)
         return obs, reward, done, info
 
     def reset(self):
-        self.env.reset()
+        if self.chopped:
+            self.location_index += 1
+
+        if not self.can_quick_reset() or self.location_index==-1:
+            self.env.reset()
+            self.location_index = 0
+        else:
+            self.quick_reset()
+
         self.init_env()
 
         x, y, z, yaw, pitch = self.spawn()
@@ -169,10 +183,16 @@ class Mission:
                 (1, -3), (2, -3), (3, -3),
             ]
         else:
-            x_z = self.spawn_locations[random.randint(0, self.max_location_index - 1)]
+            x_z = self.spawn_locations[self.location_index]
 
         rad = [-90, 0, 90, 180]
 
         pos = random.choice(x_z)
         yaw = random.choice(rad)
         return pos[0], 2, pos[1], yaw, 0
+
+    def can_quick_reset(self):
+        return self.location_index <= self.max_location_index
+
+    def quick_reset(self):
+        self.env.clear_inventory()

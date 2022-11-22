@@ -88,7 +88,6 @@ class Worker(Thread):
                 q_lock.release()
                 obs = local_env.reset()
                 if isinstance(obs, int):
-                    local_env.__exit__()
                     local_env = SkyRunner.CustomEnv()
                     obs = local_env.reset()
                 r_lock.acquire()

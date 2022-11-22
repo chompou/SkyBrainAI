@@ -21,17 +21,14 @@ class MultithreadGym(gym.Env):
         return observation, reward, done, info
 
     def reset(self):
-        ready = False
-        if self.env is not None:
+        local_obs = 0
+        if self.env is None:
+            local_obs = self.load_env()
+        elif not self.env.can_quick_reset():
             self.factory.queue_done(self.env)
-        while not ready:
-            local_obs, local_env = self.factory.get_ready()
-            if isinstance(local_obs, int):
-                env = SkyRunner.CustomEnv()
-                self.factory.queue_done(env)
-            else:
-                ready = True
-        self.env = local_env
+            local_obs = self.load_env()
+        elif self.env.can_quick_reset():
+            local_obs = self.env.reset()
         return local_obs
 
     def render(self, mode="human"):
@@ -41,5 +38,18 @@ class MultithreadGym(gym.Env):
         return self.env.save_rgb()
 
     def close(self):
+        self.env.close()
         self.factory.stop()
-        self.__exit__()
+
+    def load_env(self):
+        ready = False
+        local_obs = 0
+        while not ready:
+            local_obs, local_env = self.factory.get_ready()
+            if isinstance(local_obs, int):
+                env = SkyRunner.CustomEnv()
+                self.factory.queue_done(env)
+            else:
+                ready = True
+            self.env = local_env
+        return local_obs
