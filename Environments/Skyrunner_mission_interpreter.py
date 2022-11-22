@@ -98,8 +98,8 @@ class Mission:
         if self.attack:
             curr_b = info.get('rays')[0]
             curr_d = info.get('rays')[1]
-            prev_b = self.delta.get('rays')[0]
-            prev_d = self.delta.get('rays')[1]
+            prev_b = self.delta[3].get('rays')[0]
+            prev_d = self.delta[3].get('rays')[1]
             if curr_b == 'wood' and curr_d < self.chopped_dist:
                 reward += 10
             if prev_b == 'wood' and prev_d < self.chopped_dist and (prev_d != curr_d or prev_b != curr_b):
