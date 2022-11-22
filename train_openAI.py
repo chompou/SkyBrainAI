@@ -21,6 +21,7 @@ class ImageRecorderCallback(BaseCallback):
 
 
 def train(env,
+          eval_env,
           total_timesteps=150000,
           eval_freq=100,
           n_eval_episodes=5,
@@ -71,7 +72,7 @@ def train(env,
     model.save("last_model")
 
     model.learn(total_timesteps=total_timesteps,
-                eval_env=env,
+                eval_env=eval_env,
                 eval_freq=eval_freq,
                 n_eval_episodes=n_eval_episodes,
                 )
