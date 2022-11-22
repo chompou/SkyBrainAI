@@ -25,6 +25,7 @@ def create_env():
         drawing_str=draw_string,
         use_lidar=True,
         allow_mob_spawn=False,
+        break_speed_multiplier=10,
         lidar_rays=[(0, 0, 999)]
     )
 
