@@ -18,7 +18,10 @@ Verify that the java-version is correct by running `java -version`. The output s
 ### 2. Installing Dependencies:
 ```text
 pip install minedojo, stable-baselines3, torchvision, tensorboard
+
+change variables guiScale and renderDistance in venv/lib/python../site-packages/minedojo/sim/Malmo/Minecraft/run/options.txt to 1
 ```
+
 
 ### 3. Run traning
 To run the training, use the Jupyter Notebook [CoolNotz.ipynb](./CoolNotz.ipynb)
