@@ -42,14 +42,9 @@ class MultithreadGym(gym.Env):
         self.factory.stop()
 
     def load_env(self):
-        ready = False
-        local_obs = 0
-        while not ready:
-            local_obs, local_env = self.factory.get_ready()
-            if isinstance(local_obs, int):
-                env = SkyRunner.CustomEnv()
-                self.factory.queue_done(env)
-            else:
-                ready = True
-            self.env = local_env
+        if self.env is not None:
+            self.factory.queue_done(self.env) # Put old environment in reset-machine
+
+        local_obs, local_env = self.factory.get_ready() # Load freshly resatt enviornment
+        self.env = local_env
         return local_obs

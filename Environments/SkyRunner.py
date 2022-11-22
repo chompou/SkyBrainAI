@@ -17,11 +17,12 @@ def create_env():
         generate_world_type='flat',
         flat_world_seed_string="0",
         start_position=dict(x=0, y=2, z=0, yaw=0, pitch=0),
-        #fast_reset=True,
+        # fast_reset=True,
         start_time=6000,
         allow_time_passage=False,
         drawing_str=draw_string,
         use_lidar=True,
+        allow_mob_spawn=False,
         lidar_rays=[(0, 0, 999)]
     )
 
@@ -32,6 +33,7 @@ def create_env():
                                                  env=env,
                                                  spawn_locations=spawn_locations
                                                  )
+
 
 class CustomEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
@@ -66,7 +68,6 @@ class CustomEnv(gym.Env):
     def close(self):
         if self.env is not None:
             self.env.quit()
-        self.__exit__()
 
     def can_quick_reset(self):
         return self.env.can_quick_reset()
