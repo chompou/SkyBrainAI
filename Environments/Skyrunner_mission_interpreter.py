@@ -162,11 +162,6 @@ class Mission:
         result = np.dstack((n1, n2, n3))
         return Image(result, "HWC")
 
-    def test_teleport(self):
-        x, y, z, yaw, pitch = spawn()
-        self.env.teleport_agent(x=x, y=y, z=z, yaw=yaw, pitch=pitch)
-        a, _, __, ___ = self.stepNum(100)
-        return a
 
     def rgb_simplify(self, array):
         return self.resize(torch.Tensor(array[:, :600, :600].copy())).numpy().astype(dtype='uint8')

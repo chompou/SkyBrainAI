@@ -17,6 +17,7 @@ class Factory:
         super().__init__()
         global q
         global r
+        global q_lock
         self.threads = []
         for i in range(env_int):
             env = SkyRunner.CustomEnv()
@@ -78,9 +79,13 @@ class Worker(Thread):
         while not exit_flag:
             try:
                 print("ThreadID %d waiting for environment to reset." % self.thread_id)
-                local_env = q.get(block=True, timeout=5)
 
+                q_lock.acquire()
+                local_env = q.get(block=True, timeout=5)
                 print("ThreadID: %d has received an enviornment from queue. Reset of envornment is being prepeared" % ( self.thread_id))
+                q.task_done()
+                q_lock.release()
+
                 obs = local_env.reset()
 
                 while isinstance(obs, int):
@@ -91,5 +96,6 @@ class Worker(Thread):
                 r.put((obs, local_env), block=False)
                 print("ThreadID %d put complete environment into ready-queue." % self.thread_id)
             except queue.Empty:
-                print("Queue-GET timed out. Trying again, if not exit_falg has been sat. ThreadID: %d" % self.thread_id)
+                q_lock.release()
+                print("Queue-GET timed out. Trying again, if not exit_flag has been sat. ThreadID: %d" % self.thread_id)
                 continue
