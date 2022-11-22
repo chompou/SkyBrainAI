@@ -20,7 +20,7 @@ class ImageRecorderCallback(BaseCallback):
         return True
 
 
-def train(env, eval_env=None, eval_freq=2000):
+def train(env, eval_freq=100):
     """
     Train and save the DQN model, for the cartpole problem
     :param args: (ArgumentParser) the input arguments
@@ -47,7 +47,7 @@ def train(env, eval_env=None, eval_freq=2000):
     model.save("last_model")
 
     model.learn(total_timesteps=150000,
-                eval_env=eval_env,
+                eval_env=env,
                 eval_freq=eval_freq,
                 n_eval_episodes=5,
                 #callback=ImageRecorderCallback(env=env)

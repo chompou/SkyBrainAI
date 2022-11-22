@@ -120,6 +120,7 @@ class Mission:
     def reset(self):
         if self.chopped:
             self.location_index += 1
+            print("Broken block detected. Moving to location %d" % self.location_index)
 
         if not self.can_quick_reset() or self.location_index == -1:
             self.env.reset()
@@ -191,11 +192,13 @@ class Mission:
         return self.location_index < self.max_location_index
 
     def quick_reset(self):
+        self.env.kill_agent()
         attempts = 5
         for i in range(attempts):
             try:
                 self.env.clear_inventory()
+
                 print("Inventory cleared!")
-                i = attempts
+                break
             except:
                 print("Unable to clear inventory... Retyring %d more times" % (attempts - i))

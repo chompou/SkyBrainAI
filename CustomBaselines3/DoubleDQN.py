@@ -219,7 +219,7 @@ class DoubleDQN(OffPolicyAlgorithm):
             # Sample replay buffer
             if self.use_prioritized_replay:
                 self.beta = self.prioritized_replay_beta_schedule(self._current_progress_remaining)
-                replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env, beta=beta)
+                replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env, beta=self.beta)
             else:
                 replay_data = self.replay_buffer.sample(batch_size, env=self._vec_normalize_env)
 
