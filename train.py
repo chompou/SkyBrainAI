@@ -1,5 +1,4 @@
 import time
-from datetime import datetime
 from itertools import count
 from datetime import datetime
 import numpy as np
@@ -7,7 +6,7 @@ from matplotlib import pyplot as plt
 from IPython.display import clear_output
 
 import ddql
-import SkyRunner
+from Environments import SkyRunner
 
 
 def train(agent, env, max_episodes=1000000, checkpoint_every=10, update_stats_every=1, render=False):
