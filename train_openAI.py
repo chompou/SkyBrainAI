@@ -20,7 +20,27 @@ class ImageRecorderCallback(BaseCallback):
         return True
 
 
-def train(env, eval_freq=100):
+def train(env,
+          total_timesteps=150000,
+          eval_freq=100,
+          n_eval_episodes=5,
+          learning_rate=1e-4,
+          learning_starts=750,
+          buffer_size=30000,
+          batch_size=150,
+          exploration_initial_eps=1.0,
+          exploration_fraction=0.45,
+          exploration_final_eps=0.075,
+          gamma=0.98,
+          target_update_interval=3,
+          gradient_steps=-1,
+          tau=0.98,
+          use_prioritized_replay=True,
+          prioritized_replay_eps=1e-5,
+          prioritized_replay_initial_beta=1.0,
+          prioritized_replay_final_beta=0.2,
+          prioritized_replay_beta_fraction=0.4,
+):
     """
     Train and save the DQN model, for the cartpole problem
     :param args: (ArgumentParser) the input arguments
@@ -29,27 +49,30 @@ def train(env, eval_freq=100):
     model = DoubleDQN(
         env=env,
         policy=MlpPolicy,
-        learning_rate=1e-4,
-        learning_starts=750,
-        buffer_size=30000,
-        exploration_fraction=0.45,
-        exploration_final_eps=0.075,
-        gamma=0.98,
-        target_update_interval=3,
-        gradient_steps=-1,
-        batch_size=150,
-        tau=0.98,
+        learning_rate=learning_rate,
+        learning_starts=learning_starts,
+        buffer_size=buffer_size,
+        exploration_initial_eps=exploration_initial_eps,
+        exploration_fraction=exploration_fraction,
+        exploration_final_eps=exploration_final_eps,
+        gamma=gamma,
+        target_update_interval=target_update_interval,
+        gradient_steps=gradient_steps,
+        batch_size=batch_size,
+        tau=tau,
         tensorboard_log="./DQN_steve_tensorboard/",
-        use_prioritized_replay=True,
-        prioritized_replay_eps=1e-5
+        use_prioritized_replay=use_prioritized_replay,
+        prioritized_replay_eps=prioritized_replay_eps,
+        prioritized_replay_initial_beta=prioritized_replay_initial_beta,
+        prioritized_replay_beta_fraction =prioritized_replay_beta_fraction,
+        prioritized_replay_final_beta=prioritized_replay_final_beta
     )
 
     model.save("last_model")
 
-    model.learn(total_timesteps=150000,
+    model.learn(total_timesteps=total_timesteps,
                 eval_env=env,
                 eval_freq=eval_freq,
-                n_eval_episodes=5,
-                #callback=ImageRecorderCallback(env=env)
+                n_eval_episodes=n_eval_episodes,
                 )
 
