@@ -121,7 +121,7 @@ class Mission:
         if self.chopped:
             self.location_index += 1
 
-        if not self.can_quick_reset() or self.location_index==-1:
+        if not self.can_quick_reset() or self.location_index == -1:
             self.env.reset()
             self.location_index = 0
         else:
@@ -133,6 +133,7 @@ class Mission:
 
         self.env.teleport_agent(x=x, y=y, z=z, yaw=yaw, pitch=pitch)
 
+        ## Let Steve hit the ground
         for i in range(2):
             _, __, ___, ____ = self.stepNum(100)
 
@@ -192,7 +193,14 @@ class Mission:
         return pos[0], 2, pos[1], yaw, 0
 
     def can_quick_reset(self):
-        return self.location_index <= self.max_location_index
+        return self.location_index < self.max_location_index
 
     def quick_reset(self):
-        self.env.clear_inventory()
+        attempts = 5
+        for i in range(attempts):
+            try:
+                self.env.clear_inventory()
+                print("Inventory cleared!")
+                i = attempts
+            except:
+                print("Unable to clear inventory... Retyring %d more times" % (attempts - i))

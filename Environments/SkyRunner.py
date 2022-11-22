@@ -55,19 +55,18 @@ class CustomEnv(gym.Env):
         if self.env is None:
             self.env = create_env()
 
+        try:
+            return self.env.reset()
+        except:
+            print("Unable to reset enviornment due to an exception")
+            print(traceback.format_exc())
             try:
-                return self.env.reset()
+                self.env.quit()
             except:
-                print("Unable to reset enviornment due to an exception")
-                print(traceback.format_exc())
-                try:
-                    self.env.quit()
-                except:
-                    print("Failed to terminate broken enviornment.")
-                self.env = None
+                print("Failed to terminate broken enviornment.")
+            self.env = None
 
-                return -1
-        return self.env.reset()
+            return -1
 
     def render(self, mode="human"):
         return self.env.render(mode=mode)

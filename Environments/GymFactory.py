@@ -80,12 +80,11 @@ class Worker(Thread):
                 print("ThreadID %d waiting for environment to reset." % self.thread_id)
                 local_env = q.get(block=True, timeout=5)
 
-
-                print(self.thread_id, "got", local_env)
+                print("ThreadID: %d has received an enviornment from queue. Reset of envornment is being prepeared" % ( self.thread_id))
                 obs = local_env.reset()
 
                 while isinstance(obs, int):
-                    print("Failed to load environment, retrying... ThreadID: %d" % self.thread_id)
+                    print("Failed to load/reset environment, retrying... ThreadID: %d" % self.thread_id)
                     local_env = SkyRunner.CustomEnv()
                     obs = local_env.reset()
 
