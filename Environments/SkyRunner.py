@@ -54,7 +54,7 @@ class CustomEnv(gym.Env):
     def reset(self):
         if self.env is None:
             self.env = create_env()
-        for i in range(10):
+
             try:
                 return self.env.reset()
             except:
@@ -65,7 +65,9 @@ class CustomEnv(gym.Env):
                 except:
                     print("Failed to terminate broken enviornment.")
                 self.env = None
-        return -1
+
+                return -1
+        return self.env.reset()
 
     def render(self, mode="human"):
         return self.env.render(mode=mode)

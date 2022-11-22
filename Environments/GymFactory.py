@@ -26,7 +26,9 @@ class Factory:
 
     def get_ready(self):
         global r
+        print("Waiting for ready enviornment")
         obs, env = r.get(block=True)
+        print("Ready enviornment received")
         return obs, env
 
     def queue_done(self, done_env):
@@ -78,6 +80,7 @@ class Worker(Thread):
                 print("ThreadID %d waiting for environment to reset." % self.thread_id)
                 local_env = q.get(block=True, timeout=5)
 
+
                 print(self.thread_id, "got", local_env)
                 obs = local_env.reset()
 
@@ -86,7 +89,8 @@ class Worker(Thread):
                     local_env = SkyRunner.CustomEnv()
                     obs = local_env.reset()
 
-                r.put((obs, local_env))
+                r.put((obs, local_env), block=False)
+                print("ThreadID %d put complete environment into ready-queue." % self.thread_id)
             except queue.Empty:
                 print("Queue-GET timed out. Trying again, if not exit_falg has been sat. ThreadID: %d" % self.thread_id)
                 continue
