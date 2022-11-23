@@ -201,8 +201,9 @@ class Mission:
         for i in range(attempts):
             try:
                 self.env.clear_inventory()
+                self.env.execute_cmd("/weather clear")
 
-                print("Inventory cleared!")
+                print("Inventory and weather cleared!")
                 break
             except:
-                print("Unable to clear inventory... Retyring %d more times" % (attempts - i))
+                print("Unable to clear inventory or weather... Retyring %d more times" % (attempts - i))
