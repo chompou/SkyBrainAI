@@ -35,6 +35,7 @@ def create_env():
     return Skyrunner_mission_interpreter.Mission(survival=True,
                                                  explore=True,
                                                  episode_length=1000,
+                                                 obs_grayscale=True,
                                                  min_y=-3,
                                                  env=env,
                                                  spawn_locations=spawn_locations

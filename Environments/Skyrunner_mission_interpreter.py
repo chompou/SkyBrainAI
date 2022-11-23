@@ -11,6 +11,7 @@ from torchvision.transforms import InterpolationMode
 class Mission:
     def __init__(self, explore=False,
                  obs_simplify=True,
+                 obs_grayscale=False,
                  mine=False,
                  survival=False,
                  collect_amount=None,
@@ -28,7 +29,9 @@ class Mission:
             collect_amount = []
 
         self.resize = torchvision.transforms.Resize((60, 60), interpolation=InterpolationMode.NEAREST, antialias=None, )
+        self.grayscale = torchvision.transforms.Grayscale()
         self.obs_simplify = obs_simplify
+        self.obs_grayscale = obs_grayscale
         self.explore = explore
         self.mine = mine
         self.survival = survival
@@ -169,7 +172,10 @@ class Mission:
 
 
     def rgb_simplify(self, array):
-        return self.resize(torch.Tensor(array[:, :600, :600].copy())).numpy().astype(dtype='uint8')
+        array = torch.Tensor(array)
+        if self.obs_grayscale:
+            array = self.grayscale(array)
+        return self.resize(array[:, :600, :600]).numpy().astype(dtype='uint8')
 
     def spawn(self):
         if self.spawn_locations is None:
