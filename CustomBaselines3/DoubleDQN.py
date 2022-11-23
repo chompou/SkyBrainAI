@@ -242,7 +242,7 @@ class DoubleDQN(OffPolicyAlgorithm):
                 td_error = replay_data.actions - target_q_values
 
                 indexes = replay_data.indexes
-                priorities = np.abs(td_error) + self.prioritized_replay_eps
+                priorities = np.abs(td_error.cpu()) + self.prioritized_replay_eps
 
                 self.replay_buffer.update_priorities(indexes, priorities)
 

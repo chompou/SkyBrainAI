@@ -85,7 +85,7 @@ class Mission:
         if self.min_y:
             if info.get('ypos') < self.min_y:
                 done = True
-                reward -= 15
+                reward -= 30
         if self.obs_simplify:
             obs = self.rgb_simplify(obs.get('rgb'))
         if self.episode >= self.episode_length:
@@ -107,12 +107,16 @@ class Mission:
                 self.chopped += 1
         if self.explore:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
-            old = self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
-                'distance_travelled_cm') is not None else 0
-            if new - old:
-                reward += 1
-        if self.chopped == 5:
+            if new:
+                old = self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
+                    'distance_travelled_cm') is not None else 0
+                if new - old:
+                    reward += 1
+            elif self.episode > 100:
+                done = True
+        if self.chopped == 4:
             done = True
+            reward += 500
         self.attack = None
         self.delta = (obs, reward, done, info)
         return obs, reward, done, info
