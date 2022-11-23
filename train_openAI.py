@@ -66,7 +66,8 @@ def train(env,
         prioritized_replay_eps=prioritized_replay_eps,
         prioritized_replay_initial_beta=prioritized_replay_initial_beta,
         prioritized_replay_beta_fraction =prioritized_replay_beta_fraction,
-        prioritized_replay_final_beta=prioritized_replay_final_beta
+        prioritized_replay_final_beta=prioritized_replay_final_beta,
+        device="cpu"
     )
 
     model.save("last_model")
