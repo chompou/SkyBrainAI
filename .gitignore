@@ -6,3 +6,9 @@ logs
 neat-test
 Old
 DDQL-test/
+*./__pycache__
+DQN_steve_tensorboard
+.ipynb_checkpoints
+__pycache__
+venv
+.DS_Store
