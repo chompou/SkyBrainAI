@@ -10,21 +10,33 @@ from collections import deque
 class MultithreadGym(gym.Env):
     metadata = {"render.modes": ["human"]}
 
-    def __init__(self, thread_int=1, env_int=2, frame_stack=False, frames_int=1):
+    def __init__(self, thread_int=1, env_int=2, frame_stack=False, frames_int=1, use_grayscale=False):
         super(MultithreadGym, self).__init__()
         self.env = None
-        self.factory = GymFactory.Factory(env_int=env_int, thread_int=thread_int)
         self.action_space = spaces.Discrete(8)
         self.observation_space = spaces.Box(low=0, high=255,
                                             shape=(3, 60, 60), dtype=np.uint8)
-        self.factory.run()
         self.frame_stack = frame_stack
+
+        obs_channels = 3
+        obs_w = 60
+        obs_h = 60
+        
+        if use_grayscale:
+            obs_channels = 1
+
+        obs_shape = (obs_channels, obs_w, obs_h)
+
         if frame_stack:
-            self.observation_space = spaces.Box(low=0, high=255,
-                                                shape=(frames_int, 3, 60, 60), dtype=np.uint8)
+            obs_shape = (frames_int, *obs_shape)
             self.frame_stack = frame_stack
             self.frames_int = frames_int
             self.frame_stack_q = deque(maxlen=frames_int)
+
+        self.observation_space = spaces.Box(low=0, high=255, shape=obs_shape, dtype=np.uint8)
+
+        self.factory = GymFactory.Factory(env_int=env_int, thread_int=thread_int, use_grayscale=use_grayscale)
+        self.factory.run()
 
     def step(self, action):
         observation, reward, done, info = self.env.step(action)
