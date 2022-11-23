@@ -13,7 +13,7 @@ from collections import deque
 image_size = (660, 600)
 
 
-def create_env():
+def create_env(use_grayscale=False):
     draw_string, spawn_locations = draw_skyblock_grid(100, 100, 50)
 
     env = minedojo.make(
@@ -35,7 +35,7 @@ def create_env():
     return Skyrunner_mission_interpreter.Mission(survival=True,
                                                  explore=True,
                                                  episode_length=1000,
-                                                 obs_grayscale=True,
+                                                 obs_grayscale=use_grayscale,
                                                  min_y=-3,
                                                  env=env,
                                                  spawn_locations=spawn_locations
@@ -45,19 +45,30 @@ def create_env():
 class CustomEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
 
-    def __init__(self, frame_stack=False, frames_int=1):
+    def __init__(self, frame_stack=False, frames_int=1, use_grayscale=True):
         super(CustomEnv, self).__init__()
         self.env = None
         self.action_space = spaces.Discrete(8)
         self.observation_space = spaces.Box(low=0, high=255,
                                             shape=(3, 60, 60), dtype=np.uint8)
         self.frame_stack = frame_stack
+
+        obs_channels = 3
+        obs_w = 60
+        obs_h = 60
+        
+        if use_grayscale:
+            obs_channels = 1
+
+        obs_shape = (obs_channels, obs_w, obs_h)
+
         if frame_stack:
-            self.observation_space = spaces.Box(low=0, high=255,
-                                                shape=(frames_int, 3, 60, 60), dtype=np.uint8)
+            obs_shape = (frames_int, *obs_shape)
             self.frame_stack = frame_stack
             self.frames_int = frames_int
             self.frame_stack_q = deque(maxlen=frames_int)
+
+        self.observation_space = spaces.Box(low=0, high=255, shape=obs_shape, dtype=np.uint8)
 
     def step(self, action):
         observation, reward, done, info = self.env.stepNum(action)

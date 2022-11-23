@@ -23,12 +23,12 @@ class ImageRecorderCallback(BaseCallback):
 def train(env,
           eval_env,
           total_timesteps=150000,
-          eval_freq=100,
+          eval_freq=1000,
           n_eval_episodes=5,
           learning_rate=1e-4,
           learning_starts=750,
           buffer_size=30000,
-          batch_size=150,
+          batch_size=30,
           exploration_initial_eps=1.0,
           exploration_fraction=0.45,
           exploration_final_eps=0.075,
@@ -66,7 +66,8 @@ def train(env,
         prioritized_replay_eps=prioritized_replay_eps,
         prioritized_replay_initial_beta=prioritized_replay_initial_beta,
         prioritized_replay_beta_fraction =prioritized_replay_beta_fraction,
-        prioritized_replay_final_beta=prioritized_replay_final_beta
+        prioritized_replay_final_beta=prioritized_replay_final_beta,
+        device="cpu"
     )
 
     model.save("last_model")
