@@ -48,6 +48,7 @@ class Mission:
         self.chopped_dist = 5
         self.chopped = 0
         self.previous_episode_move = 0
+        self.wood_count = 0
 
         if spawn_locations is not None:
             self.max_location_index = len(spawn_locations)
@@ -59,6 +60,7 @@ class Mission:
         self.episode = 0
         self.chopped = 0
         self.previous_episode_move = 0
+        self.wood_count = 0
 
     def translate_action(self, action):
         forward = action == 0
@@ -91,7 +93,15 @@ class Mission:
         if self.min_y:
             if info.get('ypos') < self.min_y:
                 done = True
-                reward -= 15
+                reward -= 75
+        wood_sum = self.get_wood_count(obs)
+        if wood_sum > self.wood_count:
+            wood_new = wood_sum - self.wood_count
+            reward += int((wood_new * 1250))
+            self.wood_count = wood_sum
+        if self.wood_count == 4:
+            done = True
+            reward += 500
         if self.obs_simplify:
             obs = self.rgb_simplify(obs.get('rgb'))
         if self.episode >= self.episode_length:
@@ -107,10 +117,9 @@ class Mission:
             prev_b = self.delta[3].get('rays')[0]
             prev_d = self.delta[3].get('rays')[1]
             if curr_b == 'wood' and curr_d < self.chopped_dist:
-                reward += 10
+                reward += 4
             if prev_b == 'wood' and prev_d < self.chopped_dist and (prev_d != curr_d or prev_b != curr_b):
-                reward += 125
-                self.chopped += 1
+                self.chopped = 1
         if self.explore:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
             if new:
@@ -121,9 +130,6 @@ class Mission:
                     self.previous_episode_move = self.episode
                 elif (self.episode - self.previous_episode_move) > 200:
                     done = True
-        # if self.chopped == 4:
-        # done = True
-        # reward += 500
         self.attack = None
         self.delta = (obs, reward, done, info)
         return obs, reward, done, info
@@ -213,3 +219,11 @@ class Mission:
                 break
             except:
                 print("Unable to clear inventory or weather... Retyring %d more times" % (attempts - i))
+
+    def get_wood_count(self, obs):
+        inventory_name = obs.get('inventory').get('name')
+        wood_index = np.where(inventory_name == 'log')
+        wood_sum = 0
+        for i in range(len(wood_index[0])):
+            wood_sum += obs.get('inventory').get('quantity')[wood_index[i]][0]
+        return wood_sum
