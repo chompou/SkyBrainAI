@@ -129,9 +129,6 @@ class Mission:
                 self.previous_episode_move = self.episode
             elif (self.episode - self.previous_episode_move) > 150:
                 done = True
-        # if self.chopped == 4:
-        # done = True
-        # reward += 500
         self.attack = None
         self.delta = (obs, reward, done, info)
         return obs, reward, done, info
