@@ -26,7 +26,7 @@ class ImageRecorderCallback(BaseCallback):
 def train(env,
           eval_env,
           name,
-          total_timesteps=150000,
+          total_timesteps=300000,
           eval_freq=100,
           n_eval_episodes=5,
           learning_rate=1e-4,

@@ -50,7 +50,7 @@ class Mission:
         self.previous_episode_move = 0
         self.wood_count = 0
 
-        self.REWARD_DEATH_PUNISHMENT = -11
+        self.REWARD_DEATH_PUNISHMENT = -5
         self.REWARD_PICK_UP_WOOD = 500
         self.REWARD_HIT_ON_WOOD = 2
         self.REWARD_BONUS_AT_LEVEL_COMPLETE = 500
