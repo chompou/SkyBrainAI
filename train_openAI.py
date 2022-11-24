@@ -2,6 +2,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 from stable_baselines3.dqn import MlpPolicy
 from stable_baselines3.common.callbacks import CheckpointCallback
+import os   
 
 from CustomBaselines3.DoubleDQN import DoubleDQN
 
@@ -20,13 +21,11 @@ class ImageRecorderCallback(BaseCallback):
         self.logger.record("trajectory/image", image, exclude=("stdout", "log", "json", "csv"))
         return True
 
-checkpoint_callback = CheckpointCallback(
-  save_freq=10000,
-  save_path="./logs/",
-  name_prefix="rl_model",
-  save_replay_buffer=True,
-  save_vecnormalize=True,
-)
+
+path = "dDqn-checkpoints/"
+
+if not os.path.exists(path):
+    os.makedirs(path)
 
 def train(env,
           eval_env,
@@ -49,6 +48,14 @@ def train(env,
           prioritized_replay_initial_beta=1.0,
           prioritized_replay_final_beta=0.2,
           prioritized_replay_beta_fraction=0.4,
+          
+          checkpoint_callback = CheckpointCallback(
+            save_freq=10000,
+            save_path=path,
+            name_prefix="Checkpoint",
+            save_replay_buffer=True,
+            save_vecnormalize=True,
+        )
 ):
     """
     Train and save the DQN model, for the cartpole problem
@@ -82,6 +89,7 @@ def train(env,
     model.learn(total_timesteps=total_timesteps,
                 eval_env=eval_env,
                 eval_freq=eval_freq,
-                n_eval_episodes=n_eval_episodes, callback=checkpoint_callback
+                n_eval_episodes=n_eval_episodes, 
+                callback=checkpoint_callback
                 )
 
