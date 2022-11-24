@@ -84,7 +84,7 @@ class Mission:
             0,  # 2
             11 if cam_yaw_up else 13 if cam_yaw_down else 12,  # 3
             11 if cam_pitch_l else 13 if cam_pitch_r else 12,  # 4
-            3 if self.attack and self.delta[3].get('rays')[0] == 'wood' and self.delta[3].get('rays')[
+            3 if self.attack and (self.delta[3].get('rays')[0] == 'wood' or self.delta[3].get('rays')[0] == 'leaves') and self.delta[3].get('rays')[
                 1] < self.chopped_dist else 0,
             # 5
             0,  # 6
