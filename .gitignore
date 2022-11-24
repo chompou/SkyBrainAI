@@ -11,5 +11,4 @@ DDQL-test/
 venv
 .DS_Store
 Previous Models
-dDQN-checkpoints
 last_model.zip
