@@ -2,7 +2,6 @@ import random
 import numpy as np
 import torch
 import torchvision
-from datetime import datetime
 from stable_baselines3.common.logger import Image
 
 from torchvision.transforms import InterpolationMode
@@ -30,8 +29,9 @@ class Mission:
 
         self.resize = torchvision.transforms.Resize((60, 60), interpolation=InterpolationMode.NEAREST, antialias=None, )
         self.grayscale = torchvision.transforms.Grayscale()
+
         self.obs_simplify = obs_simplify
-        self.obs_grayscale = True
+        self.obs_grayscale = obs_grayscale
         self.explore = explore
         self.mine = mine
         self.survival = survival
@@ -47,6 +47,7 @@ class Mission:
         self.max_location_index = 0
         self.chopped_dist = 5
         self.chopped = 0
+        self.previous_episode_move = 0
 
         if spawn_locations is not None:
             self.max_location_index = len(spawn_locations)
@@ -57,6 +58,7 @@ class Mission:
         self.delta = ({}, {}, {}, {'distance_travelled_cm': 0, 'rays': ['init', 1000]})
         self.episode = 0
         self.chopped = 0
+        self.previous_episode_move = 0
 
     def translate_action(self, action):
         forward = action == 0
@@ -75,7 +77,8 @@ class Mission:
             0,  # 2
             11 if cam_yaw_up else 13 if cam_yaw_down else 12,  # 3
             11 if cam_pitch_l else 13 if cam_pitch_r else 12,  # 4
-            3 if self.attack and self.delta[3].get('rays')[0] == 'wood' and self.delta[3].get('rays')[1] < self.chopped_dist else 0,
+            3 if self.attack and self.delta[3].get('rays')[0] == 'wood' and self.delta[3].get('rays')[
+                1] < self.chopped_dist else 0,
             # 5
             0,  # 6
             0,  # 7
@@ -88,7 +91,7 @@ class Mission:
         if self.min_y:
             if info.get('ypos') < self.min_y:
                 done = True
-                reward -= 30
+                reward -= 15
         if self.obs_simplify:
             obs = self.rgb_simplify(obs.get('rgb'))
         if self.episode >= self.episode_length:
@@ -106,7 +109,7 @@ class Mission:
             if curr_b == 'wood' and curr_d < self.chopped_dist:
                 reward += 10
             if prev_b == 'wood' and prev_d < self.chopped_dist and (prev_d != curr_d or prev_b != curr_b):
-                reward += 100
+                reward += 125
                 self.chopped += 1
         if self.explore:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
@@ -115,11 +118,12 @@ class Mission:
                     'distance_travelled_cm') is not None else 0
                 if new - old:
                     reward += 1
-            elif self.episode > 100:
+                    self.previous_episode_move = self.episode
+            elif (self.previous_episode_move - self.episode) > 200:
                 done = True
-        if self.chopped == 4:
-            done = True
-            reward += 500
+        # if self.chopped == 4:
+        # done = True
+        # reward += 500
         self.attack = None
         self.delta = (obs, reward, done, info)
         return obs, reward, done, info
@@ -143,33 +147,29 @@ class Mission:
 
         ## Let Steve hit the ground
         for i in range(2):
-            _, __, ___, ____ = self.stepNum(100)
+            _, __, ___, ____ = self.step(100)
 
         return _
 
-    def step(self, action):
+    def actStep(self, action):
         _, __, ___, ____ = self.env.step(action)
         return self.eval(_, __, ___, ____)
 
     def quit(self):
         self.env.__exit__()
 
-    def stepNum(self, num):
+    def step(self, num):
         action = self.translate_action(num)
-        return self.step(action)
+        return self.actStep(action)
 
     def render(self, mode):
         self.env.render(mode)
 
     def save_rgb(self):
         array = self.delta[0]
-        n1 = array[0, :, :]
-        n2 = array[1, :, :]
-        n3 = array[2, :, :]
 
-        result = np.dstack((n1, n2, n3))
+        result = np.dstack(array)
         return Image(result, "HWC")
-
 
     def rgb_simplify(self, array):
         array = torch.Tensor(array.copy())

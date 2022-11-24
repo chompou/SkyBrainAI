@@ -76,5 +76,6 @@ def train(env,
                 eval_env=eval_env,
                 eval_freq=eval_freq,
                 n_eval_episodes=n_eval_episodes,
+                callback=ImageRecorderCallback(env)
                 )
 
