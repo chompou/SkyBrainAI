@@ -119,8 +119,8 @@ class Mission:
                 if new - old:
                     reward += 1
                     self.previous_episode_move = self.episode
-            elif (self.previous_episode_move - self.episode) > 200:
-                done = True
+                elif (self.episode - self.previous_episode_move) > 200:
+                    done = True
         # if self.chopped == 4:
         # done = True
         # reward += 500
