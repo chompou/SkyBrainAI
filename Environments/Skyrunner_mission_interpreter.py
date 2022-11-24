@@ -113,14 +113,13 @@ class Mission:
                 self.chopped += 1
         if self.explore:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
-            if new:
-                old = self.delta[3].get('distance_travelled_cm') if self.delta[3].get(
-                    'distance_travelled_cm') is not None else 0
-                if new - old:
-                    reward += 1
-                    self.previous_episode_move = self.episode
-                elif (self.episode - self.previous_episode_move) > 200:
-                    done = True
+            old = self.delta[3].get('distance_travelled_cm') if self.delta[3].get('distance_travelled_cm') is not None else 0
+
+            if new - old:
+                reward += 1
+                self.previous_episode_move = self.episode
+            elif (self.episode - self.previous_episode_move) > 150:
+                done = True
         # if self.chopped == 4:
         # done = True
         # reward += 500
