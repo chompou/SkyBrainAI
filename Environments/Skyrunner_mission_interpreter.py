@@ -50,6 +50,11 @@ class Mission:
         self.previous_episode_move = 0
         self.wood_count = 0
 
+        self.REWARD_DEATH_PUNISHMENT = -11
+        self.REWARD_PICK_UP_WOOD = 500
+        self.REWARD_HIT_ON_WOOD = 2
+        self.REWARD_BONUS_AT_LEVEL_COMPLETE = 500
+
         if spawn_locations is not None:
             self.max_location_index = len(spawn_locations)
 
@@ -93,15 +98,15 @@ class Mission:
         if self.min_y:
             if info.get('ypos') < self.min_y:
                 done = True
-                reward -= 75
+                reward += self.REWARD_DEATH_PUNISHMENT
         wood_sum = self.get_wood_count(obs)
         if wood_sum > self.wood_count:
             wood_new = wood_sum - self.wood_count
-            reward += int((wood_new * 1250))
+            reward += int((wood_new * self.REWARD_PICK_UP_WOOD))
             self.wood_count = wood_sum
         if self.wood_count == 4:
             done = True
-            reward += 500
+            reward += self.REWARD_BONUS_AT_LEVEL_COMPLETE
         if self.obs_simplify:
             obs = self.rgb_simplify(obs.get('rgb'))
         if self.episode >= self.episode_length:
@@ -117,15 +122,16 @@ class Mission:
             prev_b = self.delta[3].get('rays')[0]
             prev_d = self.delta[3].get('rays')[1]
             if curr_b == 'wood' and curr_d < self.chopped_dist:
-                reward += 4
+                reward += self.REWARD_HIT_ON_WOOD
             if prev_b == 'wood' and prev_d < self.chopped_dist and (prev_d != curr_d or prev_b != curr_b):
                 self.chopped = 1
         if self.explore:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
             old = self.delta[3].get('distance_travelled_cm') if self.delta[3].get('distance_travelled_cm') is not None else 0
+            d_pos = new - old # Delta position: position moved since last time
 
-            if new - old:
-                reward += 1
+            if d_pos: # If moved more than 0
+                reward += d_pos / 100.0  # Divide by 100 to convert cm -> m.
                 self.previous_episode_move = self.episode
             elif (self.episode - self.previous_episode_move) > 150:
                 done = True

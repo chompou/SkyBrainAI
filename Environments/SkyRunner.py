@@ -13,7 +13,7 @@ image_size = (660, 600)
 
 
 def create_env(use_grayscale=False):
-    draw_string, spawn_locations = draw_skyblock_grid(100, 100, 50)
+    draw_string, spawn_locations = draw_skyblock_grid(65, 65, 50)
 
     env = minedojo.make(
         "open-ended",
@@ -35,7 +35,7 @@ def create_env(use_grayscale=False):
                                                  explore=True,
                                                  episode_length=1000,
                                                  obs_grayscale=use_grayscale,
-                                                 min_y=-3,
+                                                 min_y=-1,
                                                  env=env,
                                                  spawn_locations=spawn_locations
                                                  )
