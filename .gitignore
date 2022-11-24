@@ -16,3 +16,4 @@ __pycache__
 DQN_steve_tensorboard
 DDQN-checkpoints
 *.zip
+*.pyc
