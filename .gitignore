@@ -11,3 +11,8 @@ venv
 .DS_Store
 Previous Models
 last_model.zip
+__pycache__
+*/__pycache__
+DQN_steve_tensorboard
+DDQN-checkpoints
+*.zip
