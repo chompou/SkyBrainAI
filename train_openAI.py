@@ -51,15 +51,17 @@ def train(env,
     :param args: (ArgumentParser) the input arguments
     """
 
-    path1 = "dDQN-checkpoints/"
+    path1 = "dDQN-checkpoints/" + name
     if not os.path.exists(path1):
         os.makedirs(path1)
+    else:
+        raise Exception("Sorry, no numbers below zero")
     
     checkpoint_callback = CheckpointCallback(
-        save_freq=10000,
+        save_freq=5000,
         save_path=path1,
         name_prefix="checkpoint",
-        save_replay_buffer=True,
+        save_replay_buffer=False,
         save_vecnormalize=True
     )
 
@@ -90,11 +92,11 @@ def train(env,
                 eval_freq=eval_freq,
                 n_eval_episodes=n_eval_episodes,
                 callback=checkpoint_callback,
-                tb_log_name="checkpoint"
+                tb_log_name=name
                 )
     
     path2 = "dDQN-checkpoints/" + name
     if not os.path.exists(path2):
         os.makedirs(path2)
 
-    model.save(path2)
+    model.save(path1 + "/" + "final_model")
