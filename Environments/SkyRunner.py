@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from Environments import Skyrunner_mission_interpreter
-from environment_drawer import draw_skyblock_grid
+from Environments.environment_drawer import draw_skyblock_grid
 import gym
 from gym import spaces
 from collections import deque
