@@ -55,7 +55,7 @@ def train(env,
     if not os.path.exists(path1):
         os.makedirs(path1)
     else:
-        raise Exception("Sorry, no numbers below zero")
+        raise Exception("Traning name already exists")
     
     checkpoint_callback = CheckpointCallback(
         save_freq=5000,
