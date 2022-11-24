@@ -4,6 +4,8 @@ from stable_baselines3.dqn import MlpPolicy
 
 from CustomBaselines3.DoubleDQN import DoubleDQN
 
+from stable_baselines3.common.callbacks import CheckpointCallback
+
 
 class ImageRecorderCallback(BaseCallback):
     def __init__(self, env, verbose=0):
@@ -18,7 +20,14 @@ class ImageRecorderCallback(BaseCallback):
         # for supported formats
         self.logger.record("trajectory/image", image, exclude=("stdout", "log", "json", "csv"))
         return True
-
+    
+checkpoint_callback = CheckpointCallback(
+  save_freq=10000,
+  save_path="dDQN-checkpoints/",
+  name_prefix="rl_model",
+  save_replay_buffer=True,
+  save_vecnormalize=True,
+)
 
 def train(env,
           eval_env,
@@ -75,5 +84,6 @@ def train(env,
                 eval_env=eval_env,
                 eval_freq=eval_freq,
                 n_eval_episodes=n_eval_episodes,
+                callback=checkpoint_callback
                 )
 
