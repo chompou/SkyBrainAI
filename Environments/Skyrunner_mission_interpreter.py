@@ -123,7 +123,7 @@ class Mission:
             prev_d = self.delta[3].get('rays')[1]
             if curr_b == 'wood' and curr_d < self.chopped_dist:
                 reward += self.REWARD_HIT_ON_WOOD
-            if prev_b == 'wood' and prev_d < self.chopped_dist and (prev_d != curr_d or prev_b != curr_b):
+            if (prev_b == 'wood' or prev_b == 'leaves') and prev_d < self.chopped_dist and (prev_d != curr_d or prev_b != curr_b):
                 self.chopped = 1
         if self.explore:
             new = info.get('distance_travelled_cm') if info.get('distance_travelled_cm') is not None else 0
