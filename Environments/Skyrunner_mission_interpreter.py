@@ -54,6 +54,7 @@ class Mission:
         self.REWARD_PICK_UP_WOOD = 500
         self.REWARD_HIT_ON_WOOD = 2
         self.REWARD_BONUS_AT_LEVEL_COMPLETE = 500
+        self.MISSION_COMPLETE_WOOD_COUNT = 5
 
         if spawn_locations is not None:
             self.max_location_index = len(spawn_locations)
@@ -99,12 +100,12 @@ class Mission:
             if info.get('ypos') < self.min_y:
                 done = True
                 reward += self.REWARD_DEATH_PUNISHMENT
-        wood_sum = self.get_wood_count(obs)
+        wood_sum = self.get_wood_count(obs) # Number of wood-blocks collected by Steve
         if wood_sum > self.wood_count:
             wood_new = wood_sum - self.wood_count
             reward += int((wood_new * self.REWARD_PICK_UP_WOOD))
-            self.wood_count = wood_sum
-        if self.wood_count == 4:
+            self.wood_count = wood_sum 
+        if self.wood_count == self.MISSION_COMPLETE_WOOD_COUNT: # Mission completed!! Wee :D
             done = True
             reward += self.REWARD_BONUS_AT_LEVEL_COMPLETE
         if self.obs_simplify:
