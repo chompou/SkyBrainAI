@@ -13,17 +13,25 @@ r_lock = threading.Lock()
 
 
 class Factory:
-    def __init__(self, env_int=5, thread_int=5):
+    def __init__(self, env_int=5, thread_int=5, frame_stack=False, frames_int=1, use_grayscale=False):
         super().__init__()
+
+        self.frame_stack = frame_stack
+        self.frames_int = frames_int
+        self.use_grayscale = use_grayscale
+
         global q
         global r
         global q_lock
         self.threads = []
         for i in range(env_int):
-            env = SkyRunner.CustomEnv()
+            env = SkyRunner.create_env(
+                use_grayscale=self.use_grayscale)
             q.put(env)
+
         for j in range(thread_int):
-            self.threads.append(Worker(j, "Reloader"))
+            self.threads.append(Worker(j, "Reloader",
+                                       use_grayscale=self.use_grayscale))
 
     def get_ready(self):
         global r
@@ -54,7 +62,7 @@ class Factory:
 
 
 class Worker(Thread):
-    def __init__(self, thread_id, name):
+    def __init__(self, thread_id, name, use_grayscale):
         threading.Thread.__init__(self)
         global q
         global r
@@ -62,6 +70,7 @@ class Worker(Thread):
         global r_lock
         self.thread_id = thread_id
         self.name = name
+        self.use_grayscale = use_grayscale
 
     def run(self) -> None:
         print("starting", self.name, self.thread_id)
@@ -82,7 +91,8 @@ class Worker(Thread):
 
                 q_lock.acquire()
                 local_env = q.get(block=True, timeout=5)
-                print("ThreadID: %d has received an enviornment from queue. Reset of envornment is being prepeared" % ( self.thread_id))
+                print("ThreadID: %d has received an enviornment from queue. Reset of envornment is being prepeared" % (
+                    self.thread_id))
                 q.task_done()
                 q_lock.release()
 
@@ -90,7 +100,7 @@ class Worker(Thread):
 
                 while isinstance(obs, int):
                     print("Failed to load/reset environment, retrying... ThreadID: %d" % self.thread_id)
-                    local_env = SkyRunner.CustomEnv()
+                    local_env = SkyRunner.create_env(use_grayscale=self.use_grayscale)
                     obs = local_env.reset()
 
                 r.put((obs, local_env), block=False)

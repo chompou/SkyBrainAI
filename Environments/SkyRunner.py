@@ -4,16 +4,15 @@ import numpy as np
 import torch
 
 from Environments import Skyrunner_mission_interpreter
-from environment_drawer import draw_skyblock_grid
+from Environments.environment_drawer import draw_skyblock_grid
 import gym
 from gym import spaces
 from collections import deque
 
-
 image_size = (660, 600)
 
 
-def create_env():
+def create_env(use_grayscale=False):
     draw_string, spawn_locations = draw_skyblock_grid(100, 100, 50)
 
     env = minedojo.make(
@@ -35,6 +34,7 @@ def create_env():
     return Skyrunner_mission_interpreter.Mission(survival=True,
                                                  explore=True,
                                                  episode_length=1000,
+                                                 obs_grayscale=use_grayscale,
                                                  min_y=-3,
                                                  env=env,
                                                  spawn_locations=spawn_locations
@@ -44,22 +44,32 @@ def create_env():
 class CustomEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
 
-    def __init__(self, frame_stack=False, frames_int=1):
+    def __init__(self, frame_stack=False, frames_int=1, use_grayscale=False):
         super(CustomEnv, self).__init__()
         self.env = None
         self.action_space = spaces.Discrete(8)
-        self.observation_space = spaces.Box(low=0, high=255,
-                                            shape=(3, 60, 60), dtype=np.uint8)
         self.frame_stack = frame_stack
+        self.use_grayscale = use_grayscale
+
+        obs_channels = 3
+        obs_w = 60
+        obs_h = 60
+
+        if use_grayscale:
+            obs_channels = 1
+
+        obs_shape = (obs_channels, obs_w, obs_h)
+
         if frame_stack:
-            self.observation_space = spaces.Box(low=0, high=255,
-                                                shape=(frames_int, 3, 60, 60), dtype=np.uint8)
+            obs_shape = (frames_int, *obs_shape)
             self.frame_stack = frame_stack
             self.frames_int = frames_int
             self.frame_stack_q = deque(maxlen=frames_int)
 
+        self.observation_space = spaces.Box(low=0, high=255, shape=obs_shape, dtype=np.uint8)
+
     def step(self, action):
-        observation, reward, done, info = self.env.stepNum(action)
+        observation, reward, done, info = self.env.step(action)
         if self.frame_stack:
             self.frame_stack_q.append(torch.tensor(observation))
             observation = torch.stack(tuple(self.frame_stack_q))
@@ -67,15 +77,10 @@ class CustomEnv(gym.Env):
 
     def reset(self):
         if self.env is None:
-            self.env = create_env()
+            self.env = create_env(self.use_grayscale)
 
         try:
             local_obs = self.env.reset()
-            if self.frame_stack:
-                for i in range(self.frames_int):
-                    self.frame_stack_q.append(torch.tensor(local_obs.copy()))
-                local_obs = torch.stack(tuple(self.frame_stack_q))
-            return local_obs
         except:
             print("Unable to reset enviornment due to an exception")
             print(traceback.format_exc())
@@ -86,6 +91,12 @@ class CustomEnv(gym.Env):
             self.env = None
 
             return -1
+
+        if self.frame_stack:
+            for i in range(self.frames_int):
+                self.frame_stack_q.append(torch.Tensor(local_obs.copy()))
+            local_obs = torch.stack(tuple(self.frame_stack_q))
+        return local_obs
 
     def render(self, mode="human"):
         return self.env.render(mode=mode)
