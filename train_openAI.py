@@ -25,7 +25,7 @@ class ImageRecorderCallback(BaseCallback):
 
 def train(env,
           eval_env,
-          fileName,
+          name,
           total_timesteps=150000,
           eval_freq=100,
           n_eval_episodes=5,
@@ -60,8 +60,7 @@ def train(env,
         save_path=path1,
         name_prefix="checkpoint",
         save_replay_buffer=True,
-        save_vecnormalize=True,
-        tb_log_name="checkpoint"
+        save_vecnormalize=True
     )
 
     model = DoubleDQN(
@@ -90,12 +89,12 @@ def train(env,
                 eval_env=eval_env,
                 eval_freq=eval_freq,
                 n_eval_episodes=n_eval_episodes,
-                callback=checkpoint_callback
+                callback=checkpoint_callback,
+                tb_log_name="checkpoint"
                 )
     
-    path2 = "dDQN-checkpoints/last_model/"
+    path2 = "dDQN-checkpoints/" + name
     if not os.path.exists(path2):
         os.makedirs(path2)
 
-    model.save(path2 + fileName)
-
+    model.save(path2)
