@@ -87,11 +87,11 @@ class Worker(Thread):
         global exit_flag
         while not exit_flag:
             try:
-                print("ThreadID %d waiting for environment to reset." % self.thread_id)
+                # print("ThreadID %d waiting for environment to reset." % self.thread_id)
 
                 q_lock.acquire()
                 local_env = q.get(block=True, timeout=5)
-                print("ThreadID: %d has received an enviornment from queue. Reset of envornment is being prepeared" % (
+                print("ThreadID: %d has received an enviornment from queue. Reset of environement is being prepeared" % (
                     self.thread_id))
                 q.task_done()
                 q_lock.release()
@@ -107,5 +107,5 @@ class Worker(Thread):
                 print("ThreadID %d put complete environment into ready-queue." % self.thread_id)
             except queue.Empty:
                 q_lock.release()
-                print("Queue-GET timed out. Trying again, if not exit_flag has been sat. ThreadID: %d" % self.thread_id)
+                # print("Queue-GET timed out. Trying again, if not exit_flag has been sat. ThreadID: %d" % self.thread_id)
                 continue
