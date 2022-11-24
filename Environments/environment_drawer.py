@@ -1,21 +1,18 @@
 import numpy as np
 
 
+# str.format('<DrawCuboid x1="%d" y1="4" z1="%d" x2="%d" y2="5" z2="%d" type="leaves"/>'
+#           % ((5 + ox), (-3 + oz), (1 + ox), (-7 + oz))) + \
+
 def draw_skyblock(ox: int = 0, oz: int = 0):
     return \
-        str.format('<DrawCuboid x1="%d" y1="0" z1="%d" x2="%d" y2="0" z2="%d" type="dirt"/>'
+        str.format('<DrawCuboid x1="%d" y1="4" z1="%d" x2="%d" y2="5" z2="%d" type="leaves"/>'
+                   % ((5 + ox), (-3 + oz), (1 + ox), (-7 + oz))) + \
+        str.format('<DrawCuboid x1="%d" y1="-2" z1="%d" x2="%d" y2="1" z2="%d" type="grass"/>'
                    % ((0 + ox), (0 + oz), (-3 + ox), (-5 + oz))) + \
-        str.format('<DrawCuboid x1="%d" y1="-1" z1="%d" x2="%d" y2="-1" z2="%d" type="dirt"/>'
-                   % ((0 + ox), (0 + oz), (-3 + ox), (-5 + oz))) + \
-        str.format('<DrawCuboid x1="%d" y1="1" z1="%d" x2="%d" y2="1" z2="%d" type="grass"/>'
-                   % ((0 + ox), (0 + oz), (-3 + ox), (-5 + oz))) + \
-        str.format('<DrawCuboid x1="%d" y1="0" z1="%d" x2="%d" y2="0" z2="%d" type="dirt"/>'
+        str.format('<DrawCuboid x1="%d" y1="-2" z1="%d" x2="%d" y2="1" z2="%d" type="grass"/>'
                    % ((1 + ox), (-3 + oz), (3 + ox), (-5 + oz))) + \
-        str.format('<DrawCuboid x1="%d" y1="-1" z1="%d" x2="%d" y2="-1" z2="%d" type="dirt"/>'
-                   % ((1 + ox), (-3 + oz), (3 + ox), (-5 + oz))) + \
-        str.format('<DrawCuboid x1="%d" y1="1" z1="%d" x2="%d" y2="1" z2="%d" type="grass"/>'
-                   % ((1 + ox), (-3 + oz), (3 + ox), (-5 + oz))) + \
-        str.format('<DrawCuboid x1="%d" y1="2" z1="%d" x2="%d" y2="5" z2="%d" type="log"/>'
+        str.format('<DrawCuboid x1="%d" y1="2" z1="%d" x2="%d" y2="6" z2="%d" type="log"/>'
                    % ((3 + ox), (-5 + oz), (3 + ox), (-5 + oz)))
 
 
@@ -32,6 +29,7 @@ def get_spawn_positions(ox: int = 0, oz: int = 0):
     ])
 
     return x_z + (ox, oz)
+
 
 def draw_skyblock_grid(rows, cols, marg):
     assert marg > 5
