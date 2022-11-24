@@ -6,6 +6,8 @@ from CustomBaselines3.DoubleDQN import DoubleDQN
 
 from stable_baselines3.common.callbacks import CheckpointCallback
 
+import os
+
 
 class ImageRecorderCallback(BaseCallback):
     def __init__(self, env, verbose=0):
@@ -20,17 +22,10 @@ class ImageRecorderCallback(BaseCallback):
         # for supported formats
         self.logger.record("trajectory/image", image, exclude=("stdout", "log", "json", "csv"))
         return True
-    
-checkpoint_callback = CheckpointCallback(
-  save_freq=10000,
-  save_path="dDQN-checkpoints/",
-  name_prefix="rl_model",
-  save_replay_buffer=True,
-  save_vecnormalize=True,
-)
 
 def train(env,
           eval_env,
+          name,
           total_timesteps=150000,
           eval_freq=100,
           n_eval_episodes=5,
@@ -56,6 +51,20 @@ def train(env,
     :param args: (ArgumentParser) the input arguments
     """
 
+    path1 = "dDQN-checkpoints/" + name
+    if not os.path.exists(path1):
+        os.makedirs(path1)
+    else:
+        raise Exception("Traning name already exists")
+    
+    checkpoint_callback = CheckpointCallback(
+        save_freq=5000,
+        save_path=path1,
+        name_prefix="checkpoint",
+        save_replay_buffer=False,
+        save_vecnormalize=True
+    )
+
     model = DoubleDQN(
         env=env,
         policy=MlpPolicy,
@@ -78,12 +87,16 @@ def train(env,
         prioritized_replay_final_beta=prioritized_replay_final_beta
     )
 
-    model.save("last_model")
-
     model.learn(total_timesteps=total_timesteps,
                 eval_env=eval_env,
                 eval_freq=eval_freq,
                 n_eval_episodes=n_eval_episodes,
-                callback=checkpoint_callback
+                callback=checkpoint_callback,
+                tb_log_name=name
                 )
+    
+    path2 = "dDQN-checkpoints/" + name
+    if not os.path.exists(path2):
+        os.makedirs(path2)
 
+    model.save(path1 + "/" + "final_model")
