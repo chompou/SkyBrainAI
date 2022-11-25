@@ -132,8 +132,7 @@ class Mission:
             d_pos = new - old # Delta position: position moved since last time
 
             if d_pos: # If moved more than 0
-                # reward += d_pos / 100.0  # Divide by 100 to convert cm -> m.
-                #### Removed reward for walking -KA ####
+                reward += (d_pos / 100.0) * (1/2)  # Divide by 100 to convert cm -> m.
                 self.previous_episode_move = self.episode
             elif (self.episode - self.previous_episode_move) > 150:
                 done = True

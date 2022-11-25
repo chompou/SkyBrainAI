@@ -69,7 +69,7 @@ def train(env,
 
     if use_cnn:
         policy = CnnPolicy
-        policy_kwargs = dict(net_arch=[128, 64])
+        policy_kwargs = dict(net_arch=[64])
     else:
         policy = MlpPolicy
         policy_kwargs = None
