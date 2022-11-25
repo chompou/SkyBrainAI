@@ -1,6 +1,6 @@
 from stable_baselines3.common.callbacks import BaseCallback
 
-from stable_baselines3.dqn import MlpPolicy
+from stable_baselines3.dqn import MlpPolicy, CnnPolicy
 
 from CustomBaselines3.DoubleDQN import DoubleDQN
 
@@ -27,12 +27,12 @@ def train(env,
           eval_env,
           name,
           total_timesteps=300000,
-          eval_freq=100,
+          eval_freq=1000,
           n_eval_episodes=5,
-          learning_rate=1e-4,
+          learning_rate=1e-5,
           learning_starts=10000,
           buffer_size=100000,
-          batch_size=50,
+          batch_size=32,
           exploration_initial_eps=0.9,
           exploration_fraction=0.5,
           exploration_final_eps=0.0055,
@@ -45,9 +45,11 @@ def train(env,
           prioritized_replay_initial_beta=1.0,
           prioritized_replay_final_beta=0.1,
           prioritized_replay_beta_fraction=0.55,
+          device="auto",
+          use_cnn=True,
 ):
     """
-    Train and save the DQN model, for the cartpole problem
+    Train and save the DDQN model, for the cartpole problem
     :param args: (ArgumentParser) the input arguments
     """
 
@@ -65,9 +67,16 @@ def train(env,
         save_vecnormalize=True
     )
 
+    if use_cnn:
+        policy = CnnPolicy
+        policy_kwargs = dict(net_arch=[64])
+    else:
+        policy = MlpPolicy
+        policy_kwargs = None
+
     model = DoubleDQN(
         env=env,
-        policy=MlpPolicy,
+        policy=policy,
         learning_rate=learning_rate,
         learning_starts=learning_starts,
         buffer_size=buffer_size,
@@ -84,7 +93,9 @@ def train(env,
         prioritized_replay_eps=prioritized_replay_eps,
         prioritized_replay_initial_beta=prioritized_replay_initial_beta,
         prioritized_replay_beta_fraction =prioritized_replay_beta_fraction,
-        prioritized_replay_final_beta=prioritized_replay_final_beta
+        prioritized_replay_final_beta=prioritized_replay_final_beta,
+        device=device,
+        policy_kwargs=policy_kwargs
     )
 
     model.learn(total_timesteps=total_timesteps,
