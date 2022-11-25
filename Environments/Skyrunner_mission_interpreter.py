@@ -50,10 +50,10 @@ class Mission:
         self.previous_episode_move = 0
         self.wood_count = 0
 
-        self.REWARD_DEATH_PUNISHMENT = -2 # Penalty for falling off the skyblock
+        self.REWARD_DEATH_PUNISHMENT = -5 # Penalty for falling off the skyblock
         self.REWARD_PICK_UP_WOOD = 500 # Reward for picking up wood-item from ground
-        self.REWARD_HIT_ON_WOOD = 2 # Reward for hitting wood-block
-        self.REWARD_BONUS_AT_LEVEL_COMPLETE = 500 # Reward for completing the whole level
+        self.REWARD_HIT_ON_WOOD = 5 # Reward for hitting wood-block
+        self.REWARD_BONUS_AT_LEVEL_COMPLETE = 1500 # Reward for completing the whole level
         self.MISSION_COMPLETE_WOOD_COUNT = 5 # Number of wood-blocks to pick up before level is solved
 
         if spawn_locations is not None:
@@ -132,7 +132,7 @@ class Mission:
             d_pos = new - old # Delta position: position moved since last time
 
             if d_pos: # If moved more than 0
-                reward += (d_pos / 100.0) * (1/2)  # Divide by 100 to convert cm -> m.
+                reward += (d_pos / 100.0)  # Divide by 100 to convert cm -> m.
                 self.previous_episode_move = self.episode
             elif (self.episode - self.previous_episode_move) > 150:
                 done = True
