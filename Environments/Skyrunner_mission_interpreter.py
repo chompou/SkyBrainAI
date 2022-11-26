@@ -52,8 +52,8 @@ class Mission:
 
         self.REWARD_DEATH_PUNISHMENT = -5 # Penalty for falling off the skyblock
         self.REWARD_PICK_UP_WOOD = 500 # Reward for picking up wood-item from ground
-        self.REWARD_HIT_ON_WOOD = 5 # Reward for hitting wood-block
-        self.REWARD_BONUS_AT_LEVEL_COMPLETE = 1500 # Reward for completing the whole level
+        self.REWARD_HIT_ON_WOOD = 3 # Reward for hitting wood-block
+        self.REWARD_BONUS_AT_LEVEL_COMPLETE = 500 # Reward for completing the whole level
         self.MISSION_COMPLETE_WOOD_COUNT = 5 # Number of wood-blocks to pick up before level is solved
 
         if spawn_locations is not None:
