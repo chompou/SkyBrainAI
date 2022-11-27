@@ -5,8 +5,14 @@ AI which aims to solve the [SkyBlock](https://skyblock.net) Minecraft survival c
 - Java 1.8
 
 ## Setup project
-### 1. Configuring Java JDK
-#### On mac:
+### 1. Installing Java JDK
+It is required to have `Java SDK 1.8.x.x` installed, unfortunately a newer version such as 1.9 will not work.
+#### MacOS
+To install:
+```bash
+brew install --cask adoptopenjdk8
+```
+
 This will set Java 1.8 to your system-default Java version
 
 Insert the following line to the file `~/.zshrc`
@@ -14,10 +20,15 @@ Insert the following line to the file `~/.zshrc`
 export JAVA_HOME=$(/usr/libexec/java_home -v 1.8)
 ```
 
+#### Linux (Ubuntu- or Debian-based)
+```bash
+apt-get install openjdk-8-jdk
+```
+
 Verify that the java-version is correct by running `java -version`. The output should be `1.8.x.x`
 ### 2. Installing Dependencies:
 ```text
-pip install minedojo, stable-baselines3, torchvision, tensorboard
+pip install minedojo stable-baselines3 torchvision tensorboard
 
 change variables guiScale and renderDistance in venv/lib/python../site-packages/minedojo/sim/Malmo/Minecraft/run/options.txt to 1
 ```
