@@ -3,8 +3,8 @@ import minedojo
 import numpy as np
 import torch
 
-from Environments import Skyrunner_mission_interpreter
-from Environments.environment_drawer import draw_skyblock_grid
+from Environments import SkyRunnerMissionWrapper
+from Environments.SkyBlockDrawer import draw_skyblock_grid
 import gym
 from gym import spaces
 from collections import deque
@@ -12,9 +12,13 @@ from collections import deque
 image_size = (660, 600)
 
 
-def create_env(use_grayscale=False):
+def build_mission(use_grayscale=False):
+    """
+    Builds an environment with the correct mission-configuration for the SkyRunner mission.
+    """
     draw_string, spawn_locations = draw_skyblock_grid(65, 65, 50)
 
+    # Create the Minedojo base Environment
     env = minedojo.make(
         "open-ended",
         image_size=image_size,
@@ -31,21 +35,26 @@ def create_env(use_grayscale=False):
         lidar_rays=[(0, 0, 999)]
     )
 
-    return Skyrunner_mission_interpreter.Mission(survival=True,
-                                                 explore=True,
-                                                 episode_length=1000,
-                                                 obs_grayscale=use_grayscale,
-                                                 min_y=-1,
-                                                 env=env,
-                                                 spawn_locations=spawn_locations
-                                                 )
+    # Wrap the basic Minedojo Environment in an SkyRunnerMissionWrapper to handle action-space,
+    # observation-space, and reward-space.
+    return SkyRunnerMissionWrapper.EnvironmentMissionWrapper(survival=True,
+                                                             explore=True,
+                                                             episode_length=1000,
+                                                             obs_grayscale=use_grayscale,
+                                                             min_y=-1,
+                                                             env=env,
+                                                             spawn_locations=spawn_locations
+                                                             )
 
 
-class CustomEnv(gym.Env):
+class SkyRunnerEnvironment(gym.Env):
+    """
+    Wrapper for handling features such as frame-stacking and provide other required interfaces.
+    """
     metadata = {"render.modes": ["human"]}
 
     def __init__(self, frame_stack=False, frames_int=1, use_grayscale=False):
-        super(CustomEnv, self).__init__()
+        super(SkyRunnerEnvironment, self).__init__()
         self.env = None
         self.action_space = spaces.Discrete(8)
         self.frame_stack = frame_stack
@@ -77,7 +86,7 @@ class CustomEnv(gym.Env):
 
     def reset(self):
         if self.env is None:
-            self.env = create_env(self.use_grayscale)
+            self.env = build_mission(self.use_grayscale)
 
         try:
             local_obs = self.env.reset()

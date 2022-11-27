@@ -6,11 +6,16 @@ import torch as th
 
 from gym import spaces
 from stable_baselines3.common.buffers import ReplayBuffer
-from stable_baselines3.common.type_aliases import ReplayBufferSamples
 from stable_baselines3.common.vec_env import VecNormalize
 
 from CustomBaselines3.SegmentTree import MinSegmentTree, SumSegmentTree
 
+"""
+This is a modified version of Stable Baselines 2's Prioritized Replay class.
+It is modified to be compliant as a Stable Baselines 3 Replay Buffer Class. 
+
+https://github.com/Stable-Baselines-Team/stable-baselines/blob/f877c85b6e45084da1d8ccf73e7e730dc2001c3f/tests/test_replay_buffer.py
+"""
 
 class PrioritizedReplayBufferSamples(NamedTuple):
     observations: th.Tensor

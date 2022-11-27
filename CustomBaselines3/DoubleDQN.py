@@ -18,6 +18,9 @@ from CustomBaselines3.PrioritizedReplay import PrioritizedReplayBuffer, Prioriti
 
 DQNSelf = TypeVar("DQNSelf", bound="DQN")
 
+"""
+This is a copy of Stable-Baseline 3 DQN-Class. This class implements support for Prioritized replay
+"""
 
 class DoubleDQN(OffPolicyAlgorithm):
     """

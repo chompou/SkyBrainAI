@@ -1,5 +1,9 @@
 import operator
 
+"""
+This class is copied from Stable Baselines 2 repository.
+https://github.com/Stable-Baselines-Team/stable-baselines/blob/f877c85b6e45084da1d8ccf73e7e730dc2001c3f/stable_baselines/common/segment_tree.py
+"""
 
 class SegmentTree(object):
     def __init__(self, capacity, operation, neutral_element):
